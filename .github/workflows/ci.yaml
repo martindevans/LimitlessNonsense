@@ -27,7 +27,7 @@ jobs:
         dotnet-version: 8.x.x
 
     - name: Build
-      run: dotnet build LimitlessNonsense.slnx --configuration Release
+      run: dotnet build --configuration Release
 
     - name: Run tests
       run: dotnet test /p:Configuration=Release --verbosity normal
