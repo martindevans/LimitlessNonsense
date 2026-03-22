@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Chat/Chat.csproj" />
+  <Project Path="LimitlessNonsense.Tests/LimitlessNonsense.Tests.csproj" Id="6e8577b5-7e36-4372-81f3-f384562b1005" />
+  <Project Path="LimitlessNonsense/LimitlessNonsense.csproj" />
+</Solution>
