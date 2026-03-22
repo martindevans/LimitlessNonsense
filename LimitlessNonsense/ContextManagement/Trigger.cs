@@ -51,14 +51,15 @@ public abstract record Trigger
     /// <summary>
     /// Get the time until this trigger would next activate. Return zero or negative time to activate immediately. Return null to indicate never triggering.
     /// </summary>
+    /// <param name="now"></param>
     /// <returns></returns>
-    protected internal abstract TimeSpan? TriggerDelay();
+    protected internal abstract TimeSpan? TriggerDelay(DateTime now);
 }
 
 internal record Always
     : Trigger
 {
-    protected internal override TimeSpan? TriggerDelay()
+    protected internal override TimeSpan? TriggerDelay(DateTime now)
     {
         return TimeSpan.Zero;
     }
@@ -67,7 +68,7 @@ internal record Always
 internal record Never
     : Trigger
 {
-    protected internal override TimeSpan? TriggerDelay()
+    protected internal override TimeSpan? TriggerDelay(DateTime now)
     {
         return null;
     }
@@ -76,7 +77,7 @@ internal record Never
 internal record Idle(TimeSpan Duration)
     : Trigger
 {
-    protected internal override TimeSpan? TriggerDelay()
+    protected internal override TimeSpan? TriggerDelay(DateTime now)
     {
         return Duration;
     }
@@ -85,11 +86,11 @@ internal record Idle(TimeSpan Duration)
 internal record Schedule(TimeOnly Time)
     : Trigger
 {
-    protected internal override TimeSpan? TriggerDelay()
+    protected internal override TimeSpan? TriggerDelay(DateTime now)
     {
-        var now = TimeOnly.FromDateTime(DateTime.UtcNow);
+        var nowTime = TimeOnly.FromDateTime(now);
 
-        var next = Time - now;
+        var next = Time - nowTime;
         if (next < TimeSpan.Zero)
             next += TimeSpan.FromDays(1);
 
