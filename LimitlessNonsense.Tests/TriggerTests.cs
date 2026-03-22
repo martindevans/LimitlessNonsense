@@ -185,12 +185,24 @@ public sealed class TriggerTests
     }
 
     [TestMethod]
-    public void Never_ThrowsNotSupportedException_OnSerialization()
+    public void Never_SerializesWithCorrectDiscriminator()
     {
-        // Never is intentionally not registered with [JsonDerivedType], so serialization must fail.
         var trigger = Trigger.Never();
 
-        Assert.Throws<NotSupportedException>(() => JsonSerializer.Serialize(trigger));
+        var json = JsonSerializer.Serialize(trigger);
+
+        StringAssert.Contains(json, "\"$type\":\"Never\"");
+    }
+
+    [TestMethod]
+    public void Never_RoundTrips_ThroughJson()
+    {
+        var trigger = Trigger.Never();
+
+        var json = JsonSerializer.Serialize(trigger);
+        var deserialized = JsonSerializer.Deserialize<Trigger>(json);
+
+        Assert.AreEqual(trigger, deserialized);
     }
 
     #endregion

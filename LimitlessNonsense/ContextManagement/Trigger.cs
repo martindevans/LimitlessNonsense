@@ -4,6 +4,7 @@ namespace LimitlessNonsense.ContextManagement;
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
 [JsonDerivedType(typeof(Always), nameof(ContextManagement.Always))]
+[JsonDerivedType(typeof(Never), nameof(ContextManagement.Never))]
 [JsonDerivedType(typeof(Idle), nameof(ContextManagement.Idle))]
 [JsonDerivedType(typeof(Schedule), nameof(ContextManagement.Schedule))]
 public abstract record Trigger
