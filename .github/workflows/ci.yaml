@@ -27,10 +27,10 @@ jobs:
         dotnet-version: 8.x.x
 
     - name: Build
-      run: dotnet build --configuration Release
+      run: dotnet build $SOLUTION --configuration Release
 
     - name: Run tests
-      run: dotnet test /p:Configuration=Release --verbosity normal
+      run: dotnet test $SOLUTION /p:Configuration=Release --verbosity normal
 
 #    - name: Publish
 #      #if: startsWith(github.ref, 'refs/heads/release')
