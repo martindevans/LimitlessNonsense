@@ -18,7 +18,7 @@ public sealed class ConditionTests
     [TestMethod]
     public void Always_ReturnsTrue()
     {
-        var condition = Condition.Always();
+        var condition = Condition.True();
 
         Assert.IsTrue(condition.Evaluate(State()));
     }
@@ -26,7 +26,7 @@ public sealed class ConditionTests
     [TestMethod]
     public void Always_ReturnsTrueRepeatedCalls()
     {
-        var condition = Condition.Always();
+        var condition = Condition.True();
 
         Assert.IsTrue(condition.Evaluate(State()));
         Assert.IsTrue(condition.Evaluate(State()));
@@ -40,7 +40,7 @@ public sealed class ConditionTests
     [TestMethod]
     public void Never_ReturnsFalse()
     {
-        var condition = Condition.Never();
+        var condition = Condition.False();
 
         Assert.IsFalse(condition.Evaluate(State()));
     }
@@ -48,7 +48,7 @@ public sealed class ConditionTests
     [TestMethod]
     public void Never_ReturnsFalseRepeatedCalls()
     {
-        var condition = Condition.Never();
+        var condition = Condition.False();
 
         Assert.IsFalse(condition.Evaluate(State()));
         Assert.IsFalse(condition.Evaluate(State()));
@@ -207,7 +207,7 @@ public sealed class ConditionTests
     [TestMethod]
     public void And_TrueAndTrue_ReturnsTrue()
     {
-        var condition = Condition.Always() & Condition.Always();
+        var condition = Condition.True() & Condition.True();
 
         Assert.IsTrue(condition.Evaluate(State()));
     }
@@ -215,7 +215,7 @@ public sealed class ConditionTests
     [TestMethod]
     public void And_TrueAndFalse_ReturnsFalse()
     {
-        var condition = Condition.Always() & Condition.Never();
+        var condition = Condition.True() & Condition.False();
 
         Assert.IsFalse(condition.Evaluate(State()));
     }
@@ -223,7 +223,7 @@ public sealed class ConditionTests
     [TestMethod]
     public void And_FalseAndTrue_ReturnsFalse()
     {
-        var condition = Condition.Never() & Condition.Always();
+        var condition = Condition.False() & Condition.True();
 
         Assert.IsFalse(condition.Evaluate(State()));
     }
@@ -231,7 +231,7 @@ public sealed class ConditionTests
     [TestMethod]
     public void And_FalseAndFalse_ReturnsFalse()
     {
-        var condition = Condition.Never() & Condition.Never();
+        var condition = Condition.False() & Condition.False();
 
         Assert.IsFalse(condition.Evaluate(State()));
     }
@@ -243,7 +243,7 @@ public sealed class ConditionTests
         // the first side is false (bitwise &, not short-circuit &&)
         var changedA = Condition.Changed();
         var changedB = Condition.Changed();
-        var condition = Condition.Never() & (changedA & changedB);
+        var condition = Condition.False() & (changedA & changedB);
 
         // With short-circuit logic, changedA and changedB would NOT be evaluated.
         // With bitwise &, all sides ARE evaluated.
@@ -257,7 +257,7 @@ public sealed class ConditionTests
     [TestMethod]
     public void And_OperatorCreatesConditionAnd()
     {
-        var condition = Condition.Always() & Condition.Never();
+        var condition = Condition.True() & Condition.False();
 
         Assert.IsInstanceOfType<ConditionAnd>(condition);
     }
@@ -269,7 +269,7 @@ public sealed class ConditionTests
     [TestMethod]
     public void Or_TrueOrTrue_ReturnsTrue()
     {
-        var condition = Condition.Always() | Condition.Always();
+        var condition = Condition.True() | Condition.True();
 
         Assert.IsTrue(condition.Evaluate(State()));
     }
@@ -277,7 +277,7 @@ public sealed class ConditionTests
     [TestMethod]
     public void Or_TrueOrFalse_ReturnsTrue()
     {
-        var condition = Condition.Always() | Condition.Never();
+        var condition = Condition.True() | Condition.False();
 
         Assert.IsTrue(condition.Evaluate(State()));
     }
@@ -285,7 +285,7 @@ public sealed class ConditionTests
     [TestMethod]
     public void Or_FalseOrTrue_ReturnsTrue()
     {
-        var condition = Condition.Never() | Condition.Always();
+        var condition = Condition.False() | Condition.True();
 
         Assert.IsTrue(condition.Evaluate(State()));
     }
@@ -293,7 +293,7 @@ public sealed class ConditionTests
     [TestMethod]
     public void Or_FalseOrFalse_ReturnsFalse()
     {
-        var condition = Condition.Never() | Condition.Never();
+        var condition = Condition.False() | Condition.False();
 
         Assert.IsFalse(condition.Evaluate(State()));
     }
@@ -304,7 +304,7 @@ public sealed class ConditionTests
         // Verify bitwise | evaluates both sides even when first is true
         var changedA = Condition.Changed();
         var changedB = Condition.Changed();
-        var condition = Condition.Always() | (changedA & changedB);
+        var condition = Condition.True() | (changedA & changedB);
 
         condition.Evaluate(State(id: GuidA));
 
@@ -315,7 +315,7 @@ public sealed class ConditionTests
     [TestMethod]
     public void Or_OperatorCreatesConditionOr()
     {
-        var condition = Condition.Always() | Condition.Never();
+        var condition = Condition.True() | Condition.False();
 
         Assert.IsInstanceOfType<ConditionOr>(condition);
     }
@@ -327,7 +327,7 @@ public sealed class ConditionTests
     [TestMethod]
     public void Xor_TrueXorTrue_ReturnsFalse()
     {
-        var condition = Condition.Always() ^ Condition.Always();
+        var condition = Condition.True() ^ Condition.True();
 
         Assert.IsFalse(condition.Evaluate(State()));
     }
@@ -335,7 +335,7 @@ public sealed class ConditionTests
     [TestMethod]
     public void Xor_TrueXorFalse_ReturnsTrue()
     {
-        var condition = Condition.Always() ^ Condition.Never();
+        var condition = Condition.True() ^ Condition.False();
 
         Assert.IsTrue(condition.Evaluate(State()));
     }
@@ -343,7 +343,7 @@ public sealed class ConditionTests
     [TestMethod]
     public void Xor_FalseXorTrue_ReturnsTrue()
     {
-        var condition = Condition.Never() ^ Condition.Always();
+        var condition = Condition.False() ^ Condition.True();
 
         Assert.IsTrue(condition.Evaluate(State()));
     }
@@ -351,7 +351,7 @@ public sealed class ConditionTests
     [TestMethod]
     public void Xor_FalseXorFalse_ReturnsFalse()
     {
-        var condition = Condition.Never() ^ Condition.Never();
+        var condition = Condition.False() ^ Condition.False();
 
         Assert.IsFalse(condition.Evaluate(State()));
     }
@@ -359,7 +359,7 @@ public sealed class ConditionTests
     [TestMethod]
     public void Xor_OperatorCreatesConditionXor()
     {
-        var condition = Condition.Always() ^ Condition.Never();
+        var condition = Condition.True() ^ Condition.False();
 
         Assert.IsInstanceOfType<ConditionXor>(condition);
     }
@@ -371,7 +371,7 @@ public sealed class ConditionTests
     [TestMethod]
     public void Not_InvertsTrue_ReturnsFalse()
     {
-        var condition = !Condition.Always();
+        var condition = !Condition.True();
 
         Assert.IsFalse(condition.Evaluate(State()));
     }
@@ -379,7 +379,7 @@ public sealed class ConditionTests
     [TestMethod]
     public void Not_InvertsFalse_ReturnsTrue()
     {
-        var condition = !Condition.Never();
+        var condition = !Condition.False();
 
         Assert.IsTrue(condition.Evaluate(State()));
     }
@@ -387,7 +387,7 @@ public sealed class ConditionTests
     [TestMethod]
     public void Not_OperatorCreatesConditionNot()
     {
-        var condition = !Condition.Always();
+        var condition = !Condition.True();
 
         Assert.IsInstanceOfType<ConditionNot>(condition);
     }
@@ -400,7 +400,7 @@ public sealed class ConditionTests
     public void Composition_NotAlways_ReturnsFalse()
     {
         // !Always = false
-        var condition = !Condition.Always();
+        var condition = !Condition.True();
 
         Assert.IsFalse(condition.Evaluate(State()));
     }
@@ -409,7 +409,7 @@ public sealed class ConditionTests
     public void Composition_NotNever_ReturnsTrue()
     {
         // !Never = true
-        var condition = !Condition.Never();
+        var condition = !Condition.False();
 
         Assert.IsTrue(condition.Evaluate(State()));
     }
@@ -418,7 +418,7 @@ public sealed class ConditionTests
     public void Composition_AlwaysAndNotNever_ReturnsTrue()
     {
         // Always & !Never = true & true = true
-        var condition = Condition.Always() & !Condition.Never();
+        var condition = Condition.True() & !Condition.False();
 
         Assert.IsTrue(condition.Evaluate(State()));
     }
@@ -427,7 +427,7 @@ public sealed class ConditionTests
     public void Composition_NeverOrAlways_ReturnsTrue()
     {
         // Never | Always = false | true = true
-        var condition = Condition.Never() | Condition.Always();
+        var condition = Condition.False() | Condition.True();
 
         Assert.IsTrue(condition.Evaluate(State()));
     }

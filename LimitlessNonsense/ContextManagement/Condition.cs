@@ -18,13 +18,13 @@ public abstract record Condition
     /// Always evaluate to true
     /// </summary>
     /// <returns></returns>
-    public static Condition Always() => new ConditionAlways();
+    public static Condition True() => new ConditionAlways();
 
     /// <summary>
     /// Always evaluate to false
     /// </summary>
     /// <returns></returns>
-    public static Condition Never() => new ConditionNever();
+    public static Condition False() => new ConditionNever();
 
     /// <summary>
     /// Evaluate if the context fill factor is greater than or equal to the given threshold (0 to 1)

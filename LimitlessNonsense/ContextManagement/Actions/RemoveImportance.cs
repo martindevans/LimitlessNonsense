@@ -1,11 +1,11 @@
 ﻿namespace LimitlessNonsense.ContextManagement.Actions;
 
 /// <summary>
-/// Remove messages with the given role that are buried over a certain depth
+/// Remove messages at or below the given importance threshold which are buried over a certain depth
 /// </summary>
-/// <param name="Roles"></param>
+/// <param name="Threshold"></param>
 /// <param name="Depth"></param>
-internal record RemoveRole(MessageRole Roles, ushort Depth)
+internal record RemoveImportance(Importance Threshold, ushort Depth = 0)
     : ContextAction
 {
     public override void Execute(LLMActionContext context)
@@ -13,8 +13,7 @@ internal record RemoveRole(MessageRole Roles, ushort Depth)
         for (var i = context.Messages.Count - 1 - Depth; i >= 0; i--)
         {
             var msg = context.Messages[i];
-
-            if ((msg.Role & Roles) != 0)
+            if (msg.Importance <= Threshold)
                 context.Remove(msg);
         }
     }

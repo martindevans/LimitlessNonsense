@@ -6,4 +6,9 @@
 internal record ConditionalSequence(IReadOnlyList<ContextAction> Actions)
     : ContextAction
 {
+    public override void Execute(LLMActionContext context)
+    {
+        for (var i = 0; i < Actions.Count; i++)
+            Actions[i].Execute(context);
+    }
 }

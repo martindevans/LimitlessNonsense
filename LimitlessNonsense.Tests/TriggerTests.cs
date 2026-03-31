@@ -105,8 +105,7 @@ public sealed class TriggerTests
     [DataRow(14, 0, 15, 0, 23)]  // scheduled 14:00, now 15:00 → 23 hours until next occurrence
     [DataRow(14, 0, 14, 0, 0)]   // scheduled 14:00, now 14:00 → triggers immediately
     [DataRow( 0, 0, 23, 0, 1)]   // scheduled 00:00, now 23:00 → 1 hour (midnight rollover)
-    public void Schedule_TriggerDelay_ReturnsExpectedDelay(
-        int schedHour, int schedMin, int nowHour, int nowMin, int expectedHours)
+    public void Schedule_TriggerDelay_ReturnsExpectedDelay(int schedHour, int schedMin, int nowHour, int nowMin, int expectedHours)
     {
         var scheduledTime = new TimeOnly(schedHour, schedMin);
         var now = new DateTime(2024, 1, 1, nowHour, nowMin, 0);

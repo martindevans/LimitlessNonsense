@@ -105,12 +105,25 @@
 
 //    }
 
-//    public interface IMessage
-//    {
-//        public MessageRole Role { get; }
-//    }
-
 namespace LimitlessNonsense;
+
+public interface IContextMessage
+{
+    /// <summary>
+    /// Unique ID for this message
+    /// </summary>
+    public Guid ID { get; }
+
+    /// <summary>
+    /// Role that produced this message
+    /// </summary>
+    public MessageRole Role { get; }
+
+    /// <summary>
+    /// Importance of this message
+    /// </summary>
+    public Importance Importance { get; }
+}
 
 [Flags]
 public enum MessageRole
@@ -119,7 +132,8 @@ public enum MessageRole
     Assistant = 2,
     Reasoning = 4,
     User = 8,
-    Tool = 16
+    Tool = 16,
+    Summary = 32,
 }
 
 public enum Importance
