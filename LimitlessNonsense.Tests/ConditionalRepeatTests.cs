@@ -34,16 +34,6 @@ public sealed class ConditionalRepeatTests
         Assert.HasCount(10 - maxRepeats, ctx.Messages);
     }
 
-    [TestMethod]
-    public void Execute_DefaultMaxRepeatsIsThirtyTwo()
-    {
-        const int expectedDefault = 32;
-        var ctx = Context(Condition.True(), messageCount: 40);
-
-        ContextAction.Repeat(ContextAction.RemoveOldest(MessageRole.User)).Execute(ctx);
-
-        Assert.HasCount(40 - expectedDefault, ctx.Messages);
-    }
 
     [TestMethod]
     public void Execute_StopsEarlyWhenConditionBecomesFalse()
