@@ -1,4 +1,4 @@
-﻿namespace LimitlessNonsense.ContextManagement.Actions;
+﻿namespace LimitlessNonsense.Cleanup.Actions;
 
 /// <summary>
 /// Remove messages at or below the given importance threshold which are buried over a certain depth
@@ -8,7 +8,7 @@
 internal record RemoveImportance(Importance Threshold, ushort Depth = 0)
     : ContextAction
 {
-    public override void Execute(LLMActionContext context)
+    public override void Execute(CleanupContext context)
     {
         for (var i = context.Messages.Count - 1 - Depth; i >= 0; i--)
         {

@@ -1,21 +1,18 @@
-using LimitlessNonsense.ContextManagement;
-using LimitlessNonsense.ContextManagement.Actions;
+using LimitlessNonsense.Cleanup;
+using LimitlessNonsense.Cleanup.Actions;
 
 namespace LimitlessNonsense.Tests;
 
 [TestClass]
 public sealed class ConditionalRepeatTests
 {
-    private record TestMessage(Guid ID, MessageRole Role, Importance Importance = Importance.Normal)
-        : IContextMessage;
-
-    private static LLMActionContext Context(Condition condition, int messageCount, Guid? stateId = null)
+    private static CleanupContext Context(Condition condition, int messageCount, Guid? stateId = null)
     {
         var state = new ContextState(stateId ?? Guid.NewGuid(), 50, 100);
         var messages = Enumerable.Range(0, messageCount)
-            .Select(_ => (IContextMessage)new TestMessage(Guid.NewGuid(), MessageRole.User))
+            .Select(_ => (IContextMessage)new TestMessage(Guid.NewGuid(), MessageRole.User, Importance.Normal))
             .ToList();
-        return new LLMActionContext(condition, state, messages);
+        return new CleanupContext(condition, state, messages);
     }
 
     // -------------------------------------------------------------------------

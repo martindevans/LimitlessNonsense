@@ -1,21 +1,16 @@
-using LimitlessNonsense.ContextManagement;
-using LimitlessNonsense.ContextManagement.Actions;
+using LimitlessNonsense.Cleanup;
+using LimitlessNonsense.Cleanup.Actions;
 
 namespace LimitlessNonsense.Tests;
 
 [TestClass]
 public sealed class RemoveOldestTests
 {
-    private static LLMActionContext Context(params IContextMessage[] messages)
+    private static CleanupContext Context(params IContextMessage[] messages)
         => new(Condition.True(), new ContextState(Guid.NewGuid(), 50, 100), messages);
 
     private static IContextMessage Message(MessageRole role)
-        => new TestMessage(Guid.NewGuid(), role);
-
-    private record TestMessage(Guid ID, MessageRole Role) : IContextMessage
-    {
-        public Importance Importance => Importance.Normal;
-    }
+        => new TestMessage(Guid.NewGuid(), role, Importance.Normal);
 
     // -------------------------------------------------------------------------
     // Basic Behavior

@@ -1,4 +1,4 @@
-﻿namespace LimitlessNonsense.ContextManagement.Actions;
+﻿namespace LimitlessNonsense.Cleanup.Actions;
 
 /// <summary>
 /// Remove messages with the given role that are buried over a certain depth
@@ -8,7 +8,7 @@
 internal record RemoveRole(MessageRole Roles, ushort Depth)
     : ContextAction
 {
-    public override void Execute(LLMActionContext context)
+    public override void Execute(CleanupContext context)
     {
         for (var i = context.Messages.Count - 1 - Depth; i >= 0; i--)
         {

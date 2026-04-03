@@ -1,12 +1,12 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace LimitlessNonsense.ContextManagement;
+namespace LimitlessNonsense.Cleanup;
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
-[JsonDerivedType(typeof(Always), nameof(ContextManagement.Always))]
-[JsonDerivedType(typeof(Never), nameof(ContextManagement.Never))]
-[JsonDerivedType(typeof(Idle), nameof(ContextManagement.Idle))]
-[JsonDerivedType(typeof(Schedule), nameof(ContextManagement.Schedule))]
+[JsonDerivedType(typeof(Always), nameof(Cleanup.Always))]
+[JsonDerivedType(typeof(Never), nameof(Cleanup.Never))]
+[JsonDerivedType(typeof(Idle), nameof(Cleanup.Idle))]
+[JsonDerivedType(typeof(Schedule), nameof(Cleanup.Schedule))]
 public abstract record Trigger
 {
     #region static factories

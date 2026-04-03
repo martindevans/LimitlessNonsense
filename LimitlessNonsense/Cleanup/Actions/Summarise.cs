@@ -1,4 +1,4 @@
-﻿namespace LimitlessNonsense.ContextManagement.Actions;
+﻿namespace LimitlessNonsense.Cleanup.Actions;
 
 /// <summary>
 /// Automatically summarise the context, keeping some of the most ecent messages
@@ -7,7 +7,7 @@
 internal record Summarise(ushort Keep)
     : ContextAction
 {
-    public override void Execute(LLMActionContext context)
+    public override void Execute(CleanupContext context)
     {
         throw new NotImplementedException();
     }

@@ -1,4 +1,4 @@
-﻿namespace LimitlessNonsense.ContextManagement.Actions;
+﻿namespace LimitlessNonsense.Cleanup.Actions;
 
 /// <summary>
 /// The the oldest message which has any of the given roles
@@ -7,7 +7,7 @@
 internal record RemoveOldest(MessageRole Roles)
     : ContextAction
 {
-    public override void Execute(LLMActionContext context)
+    public override void Execute(CleanupContext context)
     {
         for (var i = 0; i < context.Messages.Count; i++)
         {
