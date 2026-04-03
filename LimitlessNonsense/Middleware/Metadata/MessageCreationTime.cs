@@ -11,7 +11,7 @@ public class AddMessageCreationTimeMetadata(bool overwrite = false)
 {
     protected override MessageCreationTime Metadata(MiddlewareContext context)
     {
-        return new MessageCreationTime(DateTime.UtcNow);
+        return new MessageCreationTime(context.Now);
     }
 }
 
@@ -50,5 +50,5 @@ public class AddMessageTimePrefix
 /// Metadata indicating when this message was created
 /// </summary>
 /// <param name="Time"></param>
-public record MessageCreationTime(DateTime Time)
+public sealed record MessageCreationTime(DateTime Time)
     : IMessageMetadata;

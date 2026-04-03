@@ -55,6 +55,6 @@ public class ElapsedTimeMessage
         }
     }
 
-    private class EphemeralTimeElapsedMessage
+    private sealed record EphemeralTimeElapsedMessage
         : IMessageMetadata;
 }
