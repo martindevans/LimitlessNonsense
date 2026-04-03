@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace LimitlessNonsense.ContextManagement.Actions;
+namespace LimitlessNonsense.Cleanup.Actions;
 
 /// <summary>
 /// Modifies the context in some way
@@ -72,7 +72,8 @@ public abstract record ContextAction
     /// </summary>
     /// <param name="keep"></param>
     /// <returns></returns>
-    public static ContextAction Summarise(ushort keep = 1)
+    public static ContextAction 
+        Summarise(ushort keep = 1)
     {
         return new Summarise(keep);
     }
@@ -81,49 +82,5 @@ public abstract record ContextAction
     /// <summary>
     /// Execute this action on the LLM context
     /// </summary>
-    public abstract void Execute(LLMActionContext context);
-}
-
-/// <summary>
-/// LLM context handle used for applying policy changes
-/// </summary>
-public record LLMActionContext
-{
-    private readonly HashSet<Guid> _removals = [ ];
-    internal IEnumerable<Guid> Removals => _removals;
-
-    private readonly List<IContextMessage> _messages;
-
-    /// <summary>Condition that triggered this action</summary>
-    public Condition Condition { get; init; }
-
-    /// <summary>State of the context</summary>
-    public ContextState State { get; init; }
-
-    /// <summary>List of messages in the context</summary>
-    public IReadOnlyList<IContextMessage> Messages => _messages;
-
-    /// <summary>
-    /// LLM context handle used for applying policy changes
-    /// </summary>
-    /// <param name="condition">Condition that triggered this action</param>
-    /// <param name="state">State of the context</param>
-    /// <param name="messages">List of messages in the context</param>
-    public LLMActionContext(Condition condition, ContextState state, IReadOnlyList<IContextMessage> messages)
-    {
-        Condition = condition;
-        State = state;
-
-        _messages = messages.ToList();
-    }
-
-    /// <summary>
-    /// Remove the given message
-    /// </summary>
-    /// <param name="msg"></param>
-    public void Remove(IContextMessage msg)
-    {
-        _removals.Add(msg.ID);
-        _messages.Remove(msg);
-    }
+    public abstract void Execute(CleanupContext context);
 }

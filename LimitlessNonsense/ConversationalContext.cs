@@ -123,6 +123,53 @@ public interface IContextMessage
     /// Importance of this message
     /// </summary>
     public Importance Importance { get; }
+
+    #region metadata
+    /// <summary>
+    /// Set or overwrite the metadata of the given type
+    /// </summary>
+    /// <typeparam name="TMetadata"></typeparam>
+    /// <param name="metadata"></param>
+    public void SetMetadata<TMetadata>(TMetadata metadata)
+        where TMetadata : class, IMessageMetadata;
+
+    /// <summary>
+    /// Try to get metadata of the given type
+    /// </summary>
+    /// <typeparam name="TMetadata"></typeparam>
+    /// <returns></returns>
+    public TMetadata? TryGetMetadata<TMetadata>()
+        where TMetadata : class,IMessageMetadata;
+    #endregion
+
+    #region content
+    /// <summary>
+    /// <see cref="Prefix"/> + <see cref="Content"/> + <see cref="Suffix"/> will be sent to the LLM as the message
+    /// </summary>
+    public string Prefix { get; set; }
+
+    /// <summary>
+    /// <see cref="Prefix"/> + <see cref="Content"/> + <see cref="Suffix"/> will be sent to the LLM as the message
+    /// </summary>
+    public string Content { get; set; }
+
+    /// <summary>
+    /// <see cref="Prefix"/> + <see cref="Content"/> + <see cref="Suffix"/> will be sent to the LLM as the message
+    /// </summary>
+    public string Suffix { get; set; }
+    #endregion
+}
+
+public static class IContextMessageExtensions
+{
+    extension(IContextMessage msg)
+    {
+        public bool HasMetadata<TMetadata>()
+            where TMetadata : class, IMessageMetadata
+        {
+            return msg.TryGetMetadata<TMetadata>() != null;
+        }
+    }
 }
 
 [Flags]
@@ -143,5 +190,7 @@ public enum Importance
     Normal = 0,
     Low = -1,
     VeryLow = -2,
+
+    Ephemeral = -3,
 }
 //}

@@ -1,22 +1,16 @@
-using LimitlessNonsense;
-using LimitlessNonsense.ContextManagement;
-using LimitlessNonsense.ContextManagement.Actions;
 using System.Text.Json;
+using LimitlessNonsense.Cleanup;
+using LimitlessNonsense.Cleanup.Actions;
 
 namespace LimitlessNonsense.Tests;
 
 [TestClass]
 public sealed class RemoveImportanceTests
 {
-    private record TestMessage(Guid ID, Importance Importance) : IContextMessage
-    {
-        public MessageRole Role => MessageRole.User;
-    }
-
     private static IContextMessage Msg(Importance importance)
-        => new TestMessage(Guid.NewGuid(), importance);
+        => new TestMessage(Guid.NewGuid(), MessageRole.User, importance);
 
-    private static LLMActionContext Context(params IContextMessage[] messages)
+    private static CleanupContext Context(params IContextMessage[] messages)
         => new(Condition.True(), new ContextState(Guid.NewGuid(), 0, 100), messages);
 
     // -------------------------------------------------------------------------

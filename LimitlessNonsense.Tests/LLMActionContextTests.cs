@@ -1,10 +1,9 @@
-using LimitlessNonsense.ContextManagement;
-using LimitlessNonsense.ContextManagement.Actions;
+using LimitlessNonsense.Cleanup;
 
 namespace LimitlessNonsense.Tests;
 
 [TestClass]
-public sealed class LLMActionContextTests
+public sealed class CleanupContextTests
 {
     private static readonly Guid GuidA = new("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
     private static readonly Guid GuidB = new("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
@@ -13,7 +12,7 @@ public sealed class LLMActionContextTests
     private static ContextState DefaultState()
         => new(GuidA, TokenCount: 50, ContextSize: 100);
 
-    private sealed record TestMessage(Guid ID, MessageRole Role, Importance Importance) : IContextMessage;
+    
 
     private static TestMessage Msg(Guid id, MessageRole role = MessageRole.User, Importance importance = Importance.Normal)
         => new(id, role, importance);
@@ -29,7 +28,7 @@ public sealed class LLMActionContextTests
         var state = DefaultState();
         IReadOnlyList<IContextMessage> messages = [Msg(GuidA), Msg(GuidB)];
 
-        var ctx = new LLMActionContext(condition, state, messages);
+        var ctx = new CleanupContext(condition, state, messages);
 
         Assert.AreEqual(condition, ctx.Condition);
         Assert.AreEqual(state, ctx.State);
@@ -40,7 +39,7 @@ public sealed class LLMActionContextTests
     public void Constructor_CopiesMessages_ChangingOriginalHasNoEffect()
     {
         var list = new List<IContextMessage> { Msg(GuidA) };
-        var ctx = new LLMActionContext(Condition.True(), DefaultState(), list);
+        var ctx = new CleanupContext(Condition.True(), DefaultState(), list);
 
         list.Add(Msg(GuidB));
 
@@ -50,7 +49,7 @@ public sealed class LLMActionContextTests
     [TestMethod]
     public void Constructor_EmptyMessages_IsAllowed()
     {
-        var ctx = new LLMActionContext(Condition.True(), DefaultState(), []);
+        var ctx = new CleanupContext(Condition.True(), DefaultState(), []);
 
         Assert.IsEmpty(ctx.Messages);
         Assert.IsFalse(ctx.Removals.Any());
@@ -64,7 +63,7 @@ public sealed class LLMActionContextTests
     public void Remove_RemovesFromMessages_AndTracksIdInRemovals()
     {
         var msg = Msg(GuidA);
-        var ctx = new LLMActionContext(Condition.True(), DefaultState(), [msg]);
+        var ctx = new CleanupContext(Condition.True(), DefaultState(), [msg]);
 
         ctx.Remove(msg);
 
@@ -78,7 +77,7 @@ public sealed class LLMActionContextTests
         var msgA = Msg(GuidA);
         var msgB = Msg(GuidB);
         var msgC = Msg(GuidC);
-        var ctx = new LLMActionContext(Condition.True(), DefaultState(), [msgA, msgB, msgC]);
+        var ctx = new CleanupContext(Condition.True(), DefaultState(), [msgA, msgB, msgC]);
 
         ctx.Remove(msgA);
         ctx.Remove(msgC);
@@ -95,7 +94,7 @@ public sealed class LLMActionContextTests
     public void Remove_SameMessageTwice_IdTrackedOnce_MessagesUnchangedOnSecondCall()
     {
         var msg = Msg(GuidA);
-        var ctx = new LLMActionContext(Condition.True(), DefaultState(), [msg]);
+        var ctx = new CleanupContext(Condition.True(), DefaultState(), [msg]);
 
         ctx.Remove(msg);
         ctx.Remove(msg); // second call — message is already gone
@@ -110,7 +109,7 @@ public sealed class LLMActionContextTests
     {
         var inList = Msg(GuidA);
         var notInList = Msg(GuidB);
-        var ctx = new LLMActionContext(Condition.True(), DefaultState(), [inList]);
+        var ctx = new CleanupContext(Condition.True(), DefaultState(), [inList]);
 
         ctx.Remove(notInList);
 

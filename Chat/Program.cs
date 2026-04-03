@@ -1,13 +1,13 @@
-﻿using LimitlessNonsense.ContextManagement;
-using LimitlessNonsense.ContextManagement.Actions;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using LimitlessNonsense;
-using static LimitlessNonsense.ContextManagement.Trigger;
-using static LimitlessNonsense.ContextManagement.Condition;
-using static LimitlessNonsense.ContextManagement.Actions.ContextAction;
+using LimitlessNonsense.Cleanup;
+using LimitlessNonsense.Cleanup.Actions;
+using static LimitlessNonsense.Cleanup.Trigger;
+using static LimitlessNonsense.Cleanup.Condition;
+using static LimitlessNonsense.Cleanup.Actions.ContextAction;
 
-var policies = new Policy[]
+var policies = new CleanupPolicy[]
 {
     // Sweep away low priority messages
     new(

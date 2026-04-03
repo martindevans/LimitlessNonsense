@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace LimitlessNonsense.ContextManagement;
+namespace LimitlessNonsense.Cleanup;
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
 [JsonDerivedType(typeof(ConditionAlways), nameof(ConditionAlways))]

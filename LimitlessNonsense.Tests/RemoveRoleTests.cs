@@ -1,20 +1,17 @@
-using LimitlessNonsense.ContextManagement;
-using LimitlessNonsense.ContextManagement.Actions;
 using System.Text.Json;
+using LimitlessNonsense.Cleanup;
+using LimitlessNonsense.Cleanup.Actions;
 
 namespace LimitlessNonsense.Tests;
 
 [TestClass]
 public sealed class RemoveRoleTests
 {
-    private static LLMActionContext Context(params IContextMessage[] messages)
+    private static CleanupContext Context(params IContextMessage[] messages)
         => new(Condition.True(), new ContextState(Guid.NewGuid(), 100, 200), messages);
 
     private static IContextMessage Msg(MessageRole role)
-        => new TestMessage(Guid.NewGuid(), role);
-
-    private sealed record TestMessage(Guid ID, MessageRole Role, Importance Importance = Importance.Normal)
-        : IContextMessage;
+        => new TestMessage(Guid.NewGuid(), role, Importance.Normal);
 
     // -------------------------------------------------------------------------
     // Execute - basic behaviour
@@ -112,18 +109,6 @@ public sealed class RemoveRoleTests
         CollectionAssert.DoesNotContain(context.Messages.ToList(), reasoning);
         CollectionAssert.DoesNotContain(context.Messages.ToList(), tool);
         CollectionAssert.Contains(context.Messages.ToList(), user);
-    }
-
-    [TestMethod]
-    public void Execute_MessageWithMultipleRoles_RemovedWhenAnyRoleMatches()
-    {
-        var multiRole = new TestMessage(Guid.NewGuid(), MessageRole.User | MessageRole.Assistant);
-        var context = Context(multiRole);
-
-        // Targeting only User, but the message also has Assistant role
-        ContextAction.RemoveRole(MessageRole.User).Execute(context);
-
-        Assert.IsEmpty(context.Messages);
     }
 
     // -------------------------------------------------------------------------

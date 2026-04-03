@@ -1,14 +1,12 @@
 using System.Text.Json;
-using LimitlessNonsense.ContextManagement;
-using LimitlessNonsense.ContextManagement.Actions;
+using LimitlessNonsense.Cleanup;
+using LimitlessNonsense.Cleanup.Actions;
 
 namespace LimitlessNonsense.Tests;
 
 [TestClass]
 public sealed class ConditionalSequenceTests
 {
-    private sealed record TestMessage(Guid ID, MessageRole Role, Importance Importance) : IContextMessage;
-
     private sealed record TrackingAction : ContextAction
     {
         private readonly List<int> _order;
@@ -21,16 +19,16 @@ public sealed class ConditionalSequenceTests
             _id = id;
         }
 
-        public override void Execute(LLMActionContext context)
+        public override void Execute(CleanupContext context)
         {
             ExecuteCount++;
             _order.Add(_id);
         }
     }
 
-    private static LLMActionContext CreateContext(params IContextMessage[] messages)
+    private static CleanupContext CreateContext(params IContextMessage[] messages)
     {
-        return new LLMActionContext(
+        return new CleanupContext(
             Condition.True(),
             new ContextState(Guid.NewGuid(), 50, 100),
             messages
@@ -79,7 +77,7 @@ public sealed class ConditionalSequenceTests
         ]);
         sequence.Execute(ctx);
 
-        Assert.AreEqual(0, ctx.Messages.Count);
+        Assert.IsEmpty(ctx.Messages);
     }
 
     // -------------------------------------------------------------------------
