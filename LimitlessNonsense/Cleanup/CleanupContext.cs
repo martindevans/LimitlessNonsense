@@ -8,7 +8,7 @@ public record CleanupContext
     private readonly HashSet<Guid> _removals = [];
     internal IEnumerable<Guid> Removals => _removals;
 
-    private readonly List<IContextMessage> _messages;
+    private readonly List<ContextMessage> _messages;
 
     /// <summary>Condition that triggered this action</summary>
     public Condition Condition { get; init; }
@@ -17,7 +17,7 @@ public record CleanupContext
     public ContextState State { get; init; }
 
     /// <summary>List of messages in the context</summary>
-    public IReadOnlyList<IContextMessage> Messages => _messages;
+    public IReadOnlyList<ContextMessage> Messages => _messages;
 
     /// <summary>
     /// LLM context handle used for applying policy changes
@@ -25,7 +25,7 @@ public record CleanupContext
     /// <param name="condition">Condition that triggered this action</param>
     /// <param name="state">State of the context</param>
     /// <param name="messages">List of messages in the context</param>
-    public CleanupContext(Condition condition, ContextState state, IReadOnlyList<IContextMessage> messages)
+    public CleanupContext(Condition condition, ContextState state, IReadOnlyList<ContextMessage> messages)
     {
         Condition = condition;
         State = state;
@@ -37,7 +37,7 @@ public record CleanupContext
     /// Remove the given message
     /// </summary>
     /// <param name="msg"></param>
-    public void Remove(IContextMessage msg)
+    public void Remove(ContextMessage msg)
     {
         _removals.Add(msg.ID);
         _messages.Remove(msg);
