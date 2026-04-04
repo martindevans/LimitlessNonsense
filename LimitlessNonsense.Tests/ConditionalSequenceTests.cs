@@ -66,8 +66,8 @@ public sealed class ConditionalSequenceTests
     [TestMethod]
     public void Execute_ContextModificationsPropagate_BetweenActions()
     {
-        var msg1 = new ContextMessage(Guid.NewGuid(), MessageRole.User, Importance.Normal);
-        var msg2 = new ContextMessage(Guid.NewGuid(), MessageRole.User, Importance.Normal);
+        var msg1 = new ContextMessage(MessageRole.User);
+        var msg2 = new ContextMessage(MessageRole.User);
         var ctx = CreateContext(msg1, msg2);
 
         // Two sequential removals: the second should see the result of the first

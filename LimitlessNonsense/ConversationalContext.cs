@@ -126,9 +126,9 @@ public sealed record class ContextMessage
 
     private readonly Dictionary<Type, object?> _metadata = [];
 
-    public ContextMessage(Guid id, MessageRole role, Importance importance)
+    public ContextMessage(MessageRole role, Importance importance = Importance.Normal, Guid? guid = null)
     {
-        ID = id;
+        ID = guid ?? Guid.NewGuid();
         Role = role;
         Importance = importance;
     }

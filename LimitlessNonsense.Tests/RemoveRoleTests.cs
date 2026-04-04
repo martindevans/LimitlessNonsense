@@ -11,7 +11,7 @@ public sealed class RemoveRoleTests
         => new(Condition.True(), new ContextState(Guid.NewGuid(), 100, 200), messages);
 
     private static ContextMessage Msg(MessageRole role)
-        => new ContextMessage(Guid.NewGuid(), role, Importance.Normal);
+        => new ContextMessage(role);
 
     // -------------------------------------------------------------------------
     // Execute - basic behaviour

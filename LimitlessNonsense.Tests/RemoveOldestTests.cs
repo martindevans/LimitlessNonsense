@@ -10,7 +10,7 @@ public sealed class RemoveOldestTests
         => new(Condition.True(), new ContextState(Guid.NewGuid(), 50, 100), messages);
 
     private static ContextMessage Message(MessageRole role)
-        => new ContextMessage(Guid.NewGuid(), role, Importance.Normal);
+        => new ContextMessage(role);
 
     // -------------------------------------------------------------------------
     // Basic Behavior
