@@ -12,7 +12,7 @@ public interface IMiddleware
 
 public class MiddlewareContext
 {
-    internal MiddlewareContext(IReadOnlyList<ContextMessage> history, DateTime now, ContextMessage message)
+    internal MiddlewareContext(List<ContextMessage> history, DateTime now, ContextMessage message)
     {
         History = history;
         Now = now;
@@ -25,7 +25,7 @@ public class MiddlewareContext
     /// <summary>
     /// History of all messages
     /// </summary>
-    public IReadOnlyList<ContextMessage> History { get; }
+    public List<ContextMessage> History { get; }
 
     /// <summary>
     /// The new message that is about to be added

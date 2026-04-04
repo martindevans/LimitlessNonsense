@@ -1,4 +1,5 @@
-﻿using Humanizer;
+﻿using System.Globalization;
+using Humanizer;
 using LimitlessNonsense.Middleware.Metadata;
 
 namespace LimitlessNonsense.Middleware.Time;
@@ -33,7 +34,7 @@ public class ElapsedTimeMessage
                     var msg = context.AddMessage(
                         MessageRole.Tool,
                         Importance.Ephemeral,
-                        content: $" --- {elapsed.Humanize()} since last message ---"
+                        content: $"{elapsed.Humanize(culture: CultureInfo.InvariantCulture)} since last message"
                     );
 
                     // Add metadata marker so we can find it later

@@ -107,7 +107,7 @@
 
 namespace LimitlessNonsense;
 
-public sealed record class ContextMessage
+public sealed record ContextMessage
 {
     /// <summary>
     /// Unique ID for this message
@@ -122,15 +122,14 @@ public sealed record class ContextMessage
     /// <summary>
     /// Importance of this message
     /// </summary>
-    public Importance Importance { get; }
+    public Importance Importance { get; set; } = Importance.Normal;
 
     private readonly Dictionary<Type, object?> _metadata = [];
 
-    public ContextMessage(MessageRole role, Importance importance = Importance.Normal, Guid? guid = null)
+    public ContextMessage(MessageRole role, Guid? guid = null)
     {
         ID = guid ?? Guid.NewGuid();
         Role = role;
-        Importance = importance;
     }
 
     #region metadata

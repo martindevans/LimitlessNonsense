@@ -8,7 +8,7 @@ namespace LimitlessNonsense.Tests;
 public sealed class RemoveImportanceTests
 {
     private static ContextMessage Msg(Importance importance)
-        => new ContextMessage(MessageRole.User, importance);
+        => new ContextMessage(MessageRole.User) { Importance = importance };
 
     private static CleanupContext Context(params ContextMessage[] messages)
         => new(Condition.True(), new ContextState(Guid.NewGuid(), 0, 100), messages);

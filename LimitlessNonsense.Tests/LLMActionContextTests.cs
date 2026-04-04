@@ -15,7 +15,7 @@ public sealed class CleanupContextTests
     
 
     private static ContextMessage Msg(Guid id, MessageRole role = MessageRole.User, Importance importance = Importance.Normal)
-        => new(role, importance, id);
+        => new(role, id) { Importance = importance };
 
     // -------------------------------------------------------------------------
     // Construction
