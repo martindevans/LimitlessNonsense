@@ -107,7 +107,7 @@
 
 namespace LimitlessNonsense;
 
-public interface IContextMessage
+public sealed record class ContextMessage
 {
     /// <summary>
     /// Unique ID for this message
@@ -124,6 +124,15 @@ public interface IContextMessage
     /// </summary>
     public Importance Importance { get; }
 
+    private readonly Dictionary<Type, object?> _metadata = [];
+
+    public ContextMessage(MessageRole role, Importance importance = Importance.Normal, Guid? guid = null)
+    {
+        ID = guid ?? Guid.NewGuid();
+        Role = role;
+        Importance = importance;
+    }
+
     #region metadata
     /// <summary>
     /// Set or overwrite the metadata of the given type
@@ -131,7 +140,10 @@ public interface IContextMessage
     /// <typeparam name="TMetadata"></typeparam>
     /// <param name="metadata"></param>
     public void SetMetadata<TMetadata>(TMetadata metadata)
-        where TMetadata : class, IMessageMetadata;
+        where TMetadata : class, IMessageMetadata
+    {
+        _metadata[typeof(TMetadata)] = metadata;
+    }
 
     /// <summary>
     /// Try to get metadata of the given type
@@ -139,37 +151,39 @@ public interface IContextMessage
     /// <typeparam name="TMetadata"></typeparam>
     /// <returns></returns>
     public TMetadata? TryGetMetadata<TMetadata>()
-        where TMetadata : class,IMessageMetadata;
+        where TMetadata : class, IMessageMetadata
+    {
+        return (TMetadata?)_metadata.GetValueOrDefault(typeof(TMetadata), null);
+    }
+
+    /// <summary>
+    /// Returns true if metadata of the given type is present
+    /// </summary>
+    /// <typeparam name="TMetadata"></typeparam>
+    /// <returns></returns>
+    public bool HasMetadata<TMetadata>()
+        where TMetadata : class, IMessageMetadata
+    {
+        return TryGetMetadata<TMetadata>() != null;
+    }
     #endregion
 
     #region content
     /// <summary>
     /// <see cref="Prefix"/> + <see cref="Content"/> + <see cref="Suffix"/> will be sent to the LLM as the message
     /// </summary>
-    public string Prefix { get; set; }
+    public string Prefix { get; set; } = "";
 
     /// <summary>
     /// <see cref="Prefix"/> + <see cref="Content"/> + <see cref="Suffix"/> will be sent to the LLM as the message
     /// </summary>
-    public string Content { get; set; }
+    public string Content { get; set; } = "";
 
     /// <summary>
     /// <see cref="Prefix"/> + <see cref="Content"/> + <see cref="Suffix"/> will be sent to the LLM as the message
     /// </summary>
-    public string Suffix { get; set; }
+    public string Suffix { get; set; } = "";
     #endregion
-}
-
-public static class IContextMessageExtensions
-{
-    extension(IContextMessage msg)
-    {
-        public bool HasMetadata<TMetadata>()
-            where TMetadata : class, IMessageMetadata
-        {
-            return msg.TryGetMetadata<TMetadata>() != null;
-        }
-    }
 }
 
 [Flags]

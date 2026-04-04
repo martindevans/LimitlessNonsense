@@ -12,7 +12,7 @@ public interface IMiddleware
 
 public class MiddlewareContext
 {
-    internal MiddlewareContext(IReadOnlyList<IContextMessage> history, DateTime now, IContextMessage message)
+    internal MiddlewareContext(IReadOnlyList<ContextMessage> history, DateTime now, ContextMessage message)
     {
         History = history;
         Now = now;
@@ -25,20 +25,20 @@ public class MiddlewareContext
     /// <summary>
     /// History of all messages
     /// </summary>
-    public IReadOnlyList<IContextMessage> History { get; }
+    public IReadOnlyList<ContextMessage> History { get; }
 
     /// <summary>
     /// The new message that is about to be added
     /// </summary>
-    public IContextMessage Message { get; }
+    public ContextMessage Message { get; }
     #endregion
 
-    public IContextMessage AddMessage(MessageRole role, Importance importance, string content)
+    public ContextMessage AddMessage(MessageRole role, Importance importance, string content)
     {
         throw new NotImplementedException();
     }
 
-    public void Remove(IContextMessage msg)
+    public void Remove(ContextMessage msg)
     {
         throw new NotImplementedException();
     }

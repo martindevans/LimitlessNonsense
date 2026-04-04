@@ -7,11 +7,11 @@ namespace LimitlessNonsense.Tests;
 [TestClass]
 public sealed class RemoveRoleTests
 {
-    private static CleanupContext Context(params IContextMessage[] messages)
+    private static CleanupContext Context(params ContextMessage[] messages)
         => new(Condition.True(), new ContextState(Guid.NewGuid(), 100, 200), messages);
 
-    private static IContextMessage Msg(MessageRole role)
-        => new TestMessage(Guid.NewGuid(), role, Importance.Normal);
+    private static ContextMessage Msg(MessageRole role)
+        => new ContextMessage(role);
 
     // -------------------------------------------------------------------------
     // Execute - basic behaviour

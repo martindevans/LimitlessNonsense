@@ -14,8 +14,8 @@ public sealed class CleanupContextTests
 
     
 
-    private static TestMessage Msg(Guid id, MessageRole role = MessageRole.User, Importance importance = Importance.Normal)
-        => new(id, role, importance);
+    private static ContextMessage Msg(Guid id, MessageRole role = MessageRole.User, Importance importance = Importance.Normal)
+        => new(role, importance, id);
 
     // -------------------------------------------------------------------------
     // Construction
@@ -26,7 +26,7 @@ public sealed class CleanupContextTests
     {
         var condition = Condition.True();
         var state = DefaultState();
-        IReadOnlyList<IContextMessage> messages = [Msg(GuidA), Msg(GuidB)];
+        IReadOnlyList<ContextMessage> messages = [Msg(GuidA), Msg(GuidB)];
 
         var ctx = new CleanupContext(condition, state, messages);
 
@@ -38,7 +38,7 @@ public sealed class CleanupContextTests
     [TestMethod]
     public void Constructor_CopiesMessages_ChangingOriginalHasNoEffect()
     {
-        var list = new List<IContextMessage> { Msg(GuidA) };
+        var list = new List<ContextMessage> { Msg(GuidA) };
         var ctx = new CleanupContext(Condition.True(), DefaultState(), list);
 
         list.Add(Msg(GuidB));
