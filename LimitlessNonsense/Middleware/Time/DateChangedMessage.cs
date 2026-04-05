@@ -28,11 +28,13 @@ public class DateChangedMessage
         // If the date has changed since the last message that was tagged with a date, add the message
         if (previous.HasValue && dateNow != previous.Value)
         {
-            var msg = context.AddMessage(
+            // Add a new message with the date changed text
+            var msg = new ContextMessage(
                 MessageRole.Tool,
                 Importance.Low,
                 $"{_prefix}{context.Now.Date.ToString(_format, CultureInfo.InvariantCulture)}{_suffix}"
             );
+            context.History.Add(msg);
 
             // Tag it with a date, so we can be sure this won't happen again
             msg.SetMetadata(new MessageCreationTime(context.Now.Date.AddTicks(1)));

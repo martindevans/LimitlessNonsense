@@ -126,10 +126,12 @@ public sealed record ContextMessage
 
     private readonly Dictionary<Type, object?> _metadata = [];
 
-    public ContextMessage(MessageRole role, Guid? guid = null)
+    public ContextMessage(MessageRole role, Importance importance = Importance.Normal, string? content = null, Guid? guid = null)
     {
         ID = guid ?? Guid.NewGuid();
+        Importance = importance;
         Role = role;
+        Content = content ?? "";
     }
 
     #region metadata

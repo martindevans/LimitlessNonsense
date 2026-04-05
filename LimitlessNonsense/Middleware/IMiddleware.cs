@@ -10,7 +10,7 @@ public interface IMiddleware
 // - Emit another message before or after
 // - Modify any of past messages
 
-public class MiddlewareContext
+public sealed class MiddlewareContext
 {
     internal MiddlewareContext(List<ContextMessage> history, DateTime now, ContextMessage message)
     {
@@ -32,14 +32,4 @@ public class MiddlewareContext
     /// </summary>
     public ContextMessage Message { get; }
     #endregion
-
-    public ContextMessage AddMessage(MessageRole role, Importance importance, string content)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Remove(ContextMessage msg)
-    {
-        throw new NotImplementedException();
-    }
 }

@@ -5,7 +5,7 @@ using LimitlessNonsense.Middleware.Metadata;
 namespace LimitlessNonsense.Middleware.Time;
 
 /// <summary>
-/// Adds an ephemeral message indicating the elapsed time since the last message, if it is more than a certain duration
+/// Adds an ephemeral message indicating the elapsed time since the last message, if it is more than a certain threshold
 /// </summary>
 public class ElapsedTimeMessage
     : IMiddleware
@@ -20,7 +20,7 @@ public class ElapsedTimeMessage
     public async Task Process(MiddlewareContext context, Func<MiddlewareContext, Task> next)
     {
         // Remove previous time message if it exists
-        Cleanup(context);
+        context.History.RemoveAll(static a => a.HasMetadata<EphemeralTimeElapsedMessage>());
 
         if (context.History.Count > 0)
         {
@@ -31,11 +31,12 @@ public class ElapsedTimeMessage
                 if (elapsed > _duration)
                 {
                     // Add new time message
-                    var msg = context.AddMessage(
+                    var msg = new ContextMessage(
                         MessageRole.Tool,
                         Importance.Ephemeral,
                         content: $"{elapsed.Humanize(culture: CultureInfo.InvariantCulture)} since last message"
                     );
+                    context.History.Add(msg);
 
                     // Add metadata marker so we can find it later
                     msg.SetMetadata(new EphemeralTimeElapsedMessage());
@@ -44,16 +45,6 @@ public class ElapsedTimeMessage
         }
 
         await next(context);
-    }
-
-    private static void Cleanup(MiddlewareContext context)
-    {
-        for (var i = context.History.Count - 1; i >= 0; i--)
-        {
-            var msg = context.History[i];
-            if (msg.HasMetadata<EphemeralTimeElapsedMessage>())
-                context.Remove(msg);
-        }
     }
 
     private sealed record EphemeralTimeElapsedMessage
