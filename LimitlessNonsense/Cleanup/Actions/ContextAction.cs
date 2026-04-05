@@ -72,8 +72,7 @@ public abstract record ContextAction
     /// </summary>
     /// <param name="keep"></param>
     /// <returns></returns>
-    public static ContextAction 
-        Summarise(ushort keep = 1)
+    public static ContextAction Summarise(ushort keep = 4)
     {
         return new Summarise(keep);
     }
