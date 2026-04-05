@@ -105,8 +105,11 @@
 
 //    }
 
+using System.Text.Json.Serialization;
+
 namespace LimitlessNonsense;
 
+[JsonConverter(typeof(ContextMessageJsonConverter))]
 public sealed record ContextMessage
 {
     /// <summary>
@@ -167,6 +170,11 @@ public sealed record ContextMessage
     {
         return TryGetMetadata<TMetadata>() != null;
     }
+
+    /// <summary>
+    /// Returns all metadata entries as type/value pairs (for serialization)
+    /// </summary>
+    internal IEnumerable<KeyValuePair<Type, object?>> GetMetadataEntries() => _metadata;
     #endregion
 
     #region content
