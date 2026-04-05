@@ -66,6 +66,8 @@ internal sealed class ContextMessageJsonConverter : JsonConverter<ContextMessage
         writer.WriteStartArray("metadata");
         foreach (var (metaType, metaValue) in value.GetMetadataEntries())
         {
+            // Null values cannot occur via the public SetMetadata API (non-nullable constraint),
+            // but the underlying dictionary allows null, so skip defensively.
             if (metaValue is null)
                 continue;
 
