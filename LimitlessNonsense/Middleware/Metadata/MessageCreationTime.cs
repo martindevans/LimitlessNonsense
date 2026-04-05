@@ -16,7 +16,7 @@ public class AddMessageCreationTimeMetadata(bool overwrite = false)
 }
 
 /// <summary>
-/// Adds a prefix to message content
+/// Adds a prefix to message content with the time of the message was created
 /// </summary>
 public class AddMessageTimePrefix
     : IMiddleware
