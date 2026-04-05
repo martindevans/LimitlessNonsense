@@ -1,5 +1,5 @@
 ﻿using System.Globalization;
-using LimitlessNonsense.Middleware.Metadata;
+using LimitlessNonsense.Metadata;
 
 namespace LimitlessNonsense.Middleware.Time;
 
@@ -23,7 +23,7 @@ public class DateChangedMessage
     public async Task Process(MiddlewareContext context, Func<MiddlewareContext, Task> next)
     {
         var previous = FindLastDate(context);
-        var dateNow = DateOnly.FromDateTime(context.Now);
+        var dateNow = DateOnly.FromDateTime(context.UtcNow);
 
         // If the date has changed since the last message that was tagged with a date, add the message
         if (previous.HasValue && dateNow != previous.Value)
@@ -32,12 +32,12 @@ public class DateChangedMessage
             var msg = new ContextMessage(
                 MessageRole.Tool,
                 Importance.Low,
-                $"{_prefix}{context.Now.Date.ToString(_format, CultureInfo.InvariantCulture)}{_suffix}"
+                $"{_prefix}{context.UtcNow.Date.ToString(_format, CultureInfo.InvariantCulture)}{_suffix}"
             );
             context.History.Add(msg);
 
             // Tag it with a date, so we can be sure this won't happen again
-            msg.SetMetadata(new MessageCreationTime(context.Now.Date.AddTicks(1)));
+            msg.SetMetadata(new MessageCreationTime(context.UtcNow.Date.AddTicks(1)));
         }
 
         await next(context);

@@ -1,4 +1,4 @@
-﻿namespace LimitlessNonsense;
+﻿namespace LimitlessNonsense.Metadata;
 
 /// <summary>
 /// Marker for metadata types

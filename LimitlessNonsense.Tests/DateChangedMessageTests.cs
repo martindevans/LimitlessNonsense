@@ -1,5 +1,5 @@
+using LimitlessNonsense.Metadata;
 using LimitlessNonsense.Middleware;
-using LimitlessNonsense.Middleware.Metadata;
 using LimitlessNonsense.Middleware.Time;
 
 namespace LimitlessNonsense.Tests;
@@ -242,7 +242,7 @@ public sealed class DateChangedMessageTests
         var context = Context(Day1, existing);
         var called = false;
 
-        await middleware.Process(context, ctx => { called = true; return Task.CompletedTask; });
+        await middleware.Process(context, _ => { called = true; return Task.CompletedTask; });
 
         Assert.IsTrue(called);
     }
@@ -255,7 +255,7 @@ public sealed class DateChangedMessageTests
         var context = Context(Day2, existing);
         var called = false;
 
-        await middleware.Process(context, ctx => { called = true; return Task.CompletedTask; });
+        await middleware.Process(context, _ => { called = true; return Task.CompletedTask; });
 
         Assert.IsTrue(called);
     }
@@ -267,7 +267,7 @@ public sealed class DateChangedMessageTests
         var context = Context(Day1);
         var called = false;
 
-        await middleware.Process(context, ctx => { called = true; return Task.CompletedTask; });
+        await middleware.Process(context, _ => { called = true; return Task.CompletedTask; });
 
         Assert.IsTrue(called);
     }

@@ -1,5 +1,5 @@
+using LimitlessNonsense.Metadata;
 using LimitlessNonsense.Middleware;
-using LimitlessNonsense.Middleware.Metadata;
 using LimitlessNonsense.Middleware.Time;
 
 namespace LimitlessNonsense.Tests;

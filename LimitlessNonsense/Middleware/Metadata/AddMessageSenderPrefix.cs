@@ -1,4 +1,6 @@
-﻿namespace LimitlessNonsense.Middleware.Metadata;
+﻿using LimitlessNonsense.Metadata;
+
+namespace LimitlessNonsense.Middleware.Metadata;
 
 /// <summary>
 /// Adds a prefix to message content
@@ -25,10 +27,3 @@ public class AddMessageSenderPrefix
         await next(context);
     }
 }
-
-/// <summary>
-/// Metadata indicating the name of the sender of this message
-/// </summary>
-/// <param name="Name"></param>
-public sealed record MessageSender(string Name)
-    : IMessageMetadata;

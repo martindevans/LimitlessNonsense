@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 using Humanizer;
-using LimitlessNonsense.Middleware.Metadata;
+using LimitlessNonsense.Metadata;
 
 namespace LimitlessNonsense.Middleware.Time;
 
@@ -27,7 +27,7 @@ public class ElapsedTimeMessage
             var time = context.History[^1].TryGetMetadata<MessageCreationTime>();
             if (time != null)
             {
-                var elapsed = context.Now - time.Time;
+                var elapsed = context.UtcNow - time.Time;
                 if (elapsed > _duration)
                 {
                     // Add new time message

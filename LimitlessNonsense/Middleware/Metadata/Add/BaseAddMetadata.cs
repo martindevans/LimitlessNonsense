@@ -1,4 +1,6 @@
-﻿namespace LimitlessNonsense.Middleware.Metadata;
+﻿using LimitlessNonsense.Metadata;
+
+namespace LimitlessNonsense.Middleware.Metadata.Add;
 
 /// <summary>
 /// Base class for pipeline stages which add metadata

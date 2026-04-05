@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LimitlessNonsense.Tests
+﻿namespace LimitlessNonsense.Tests
 {
     [TestClass]
     public class Playground

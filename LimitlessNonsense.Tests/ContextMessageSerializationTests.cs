@@ -1,5 +1,5 @@
 using System.Text.Json;
-using LimitlessNonsense.Middleware.Metadata;
+using LimitlessNonsense.Metadata;
 
 namespace LimitlessNonsense.Tests;
 

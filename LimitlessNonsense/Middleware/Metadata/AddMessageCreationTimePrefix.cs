@@ -1,31 +1,19 @@
-﻿using System.Globalization;
+﻿using LimitlessNonsense.Metadata;
+using System.Globalization;
 
 namespace LimitlessNonsense.Middleware.Metadata;
 
 /// <summary>
-/// Add UtcNow as the <see cref="MessageCreationTime"/> metadata on this message
-/// </summary>
-/// <param name="overwrite"></param>
-public class AddMessageCreationTimeMetadata(bool overwrite = false)
-    : BaseAddMetadata<MessageCreationTime>(overwrite)
-{
-    protected override MessageCreationTime Metadata(MiddlewareContext context)
-    {
-        return new MessageCreationTime(context.Now);
-    }
-}
-
-/// <summary>
 /// Adds a prefix to message content with the time of the message was created
 /// </summary>
-public class AddMessageTimePrefix
+public class AddMessageCreationTimePrefix
     : IMiddleware
 {
     private readonly string _format;
     private readonly string _pre;
     private readonly string _post;
 
-    public AddMessageTimePrefix(string format = "t", string pre = "[", string post = "]")
+    public AddMessageCreationTimePrefix(string format = "t", string pre = "[", string post = "]")
     {
         _format = format;
         _pre = pre;
@@ -45,10 +33,3 @@ public class AddMessageTimePrefix
         await next(context);
     }
 }
-
-/// <summary>
-/// Metadata indicating when this message was created
-/// </summary>
-/// <param name="Time"></param>
-public sealed record MessageCreationTime(DateTime Time)
-    : IMessageMetadata;
