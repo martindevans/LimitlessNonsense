@@ -14,7 +14,7 @@ internal record RemoveOldest(MessageRole Roles)
             var msg = context.Messages[i];
             if ((msg.Role & Roles) != 0)
             {
-                context.Messages.Remove(msg);
+                context.Messages.RemoveAt(i);
                 return true;
             }
         }

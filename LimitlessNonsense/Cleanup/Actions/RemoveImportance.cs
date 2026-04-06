@@ -16,7 +16,10 @@ internal record RemoveImportance(Importance Threshold, ushort Depth = 0)
         {
             var msg = context.Messages[i];
             if (msg.Importance <= Threshold)
-                changed |= context.Messages.Remove(msg);
+            {
+                context.Messages.RemoveAt(i);
+                changed = true;
+            }
         }
 
         return changed;
