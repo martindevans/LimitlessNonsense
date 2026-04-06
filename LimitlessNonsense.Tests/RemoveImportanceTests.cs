@@ -11,7 +11,7 @@ public sealed class RemoveImportanceTests
         => new ContextMessage(MessageRole.User) { Importance = importance };
 
     private static CleanupContext Context(params ContextMessage[] messages)
-        => new(Condition.True(), new ContextState(Guid.NewGuid(), 0, 100), messages);
+        => new(Condition.True(), new ContextState(Guid.NewGuid(), 0, 100), messages.ToList());
 
     // -------------------------------------------------------------------------
     // Basic removal
@@ -33,8 +33,8 @@ public sealed class RemoveImportanceTests
 
         // Normal, Low, VeryLow are at or below the threshold; VeryHigh and High remain
         Assert.HasCount(2, ctx.Messages);
-        Assert.IsTrue(ctx.Messages.Contains(veryHigh));
-        Assert.IsTrue(ctx.Messages.Contains(high));
+        Assert.Contains(veryHigh, ctx.Messages);
+        Assert.Contains(high, ctx.Messages);
     }
 
     // -------------------------------------------------------------------------
@@ -53,8 +53,8 @@ public sealed class RemoveImportanceTests
         action.Execute(ctx);
 
         Assert.HasCount(2, ctx.Messages);
-        Assert.IsTrue(ctx.Messages.Contains(recent1));
-        Assert.IsTrue(ctx.Messages.Contains(recent2));
+        Assert.Contains(recent1, ctx.Messages);
+        Assert.Contains(recent2, ctx.Messages);
     }
 
     // -------------------------------------------------------------------------

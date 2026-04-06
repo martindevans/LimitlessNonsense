@@ -8,13 +8,17 @@
 internal record RemoveImportance(Importance Threshold, ushort Depth = 0)
     : ContextAction
 {
-    public override void Execute(CleanupContext context)
+    public override bool Execute(CleanupContext context)
     {
+        var changed = false;
+        
         for (var i = context.Messages.Count - 1 - Depth; i >= 0; i--)
         {
             var msg = context.Messages[i];
             if (msg.Importance <= Threshold)
-                context.Remove(msg);
+                changed |= context.Messages.Remove(msg);
         }
+
+        return changed;
     }
 }

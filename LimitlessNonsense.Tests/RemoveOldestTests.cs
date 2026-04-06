@@ -7,7 +7,7 @@ namespace LimitlessNonsense.Tests;
 public sealed class RemoveOldestTests
 {
     private static CleanupContext Context(params ContextMessage[] messages)
-        => new(Condition.True(), new ContextState(Guid.NewGuid(), 50, 100), messages);
+        => new(Condition.True(), new ContextState(Guid.NewGuid(), 50, 100), messages.ToList());
 
     private static ContextMessage Message(MessageRole role)
         => new ContextMessage(role);
@@ -27,9 +27,9 @@ public sealed class RemoveOldestTests
         ContextAction.RemoveOldest(MessageRole.User).Execute(ctx);
 
         Assert.HasCount(2, ctx.Messages);
-        Assert.IsFalse(ctx.Messages.Contains(user));
-        Assert.IsTrue(ctx.Messages.Contains(system));
-        Assert.IsTrue(ctx.Messages.Contains(assistant));
+        Assert.DoesNotContain(user, ctx.Messages);
+        Assert.Contains(system, ctx.Messages);
+        Assert.Contains(assistant, ctx.Messages);
     }
 
     [TestMethod]
@@ -43,9 +43,9 @@ public sealed class RemoveOldestTests
         ContextAction.RemoveOldest(MessageRole.User).Execute(ctx);
 
         Assert.HasCount(2, ctx.Messages);
-        Assert.IsFalse(ctx.Messages.Contains(user1));
-        Assert.IsTrue(ctx.Messages.Contains(assistant));
-        Assert.IsTrue(ctx.Messages.Contains(user2));
+        Assert.DoesNotContain(user1, ctx.Messages);
+        Assert.Contains(assistant, ctx.Messages);
+        Assert.Contains(user2, ctx.Messages);
     }
 
     [TestMethod]
@@ -59,9 +59,9 @@ public sealed class RemoveOldestTests
         ContextAction.RemoveOldest(MessageRole.User | MessageRole.Assistant).Execute(ctx);
 
         Assert.HasCount(2, ctx.Messages);
-        Assert.IsFalse(ctx.Messages.Contains(user));
-        Assert.IsTrue(ctx.Messages.Contains(system));
-        Assert.IsTrue(ctx.Messages.Contains(assistant));
+        Assert.DoesNotContain(user, ctx.Messages);
+        Assert.Contains(system, ctx.Messages);
+        Assert.Contains(assistant, ctx.Messages);
     }
 
     // -------------------------------------------------------------------------
@@ -88,7 +88,7 @@ public sealed class RemoveOldestTests
         ContextAction.RemoveOldest(MessageRole.User).Execute(ctx);
 
         Assert.HasCount(2, ctx.Messages);
-        Assert.IsTrue(ctx.Messages.Contains(system));
-        Assert.IsTrue(ctx.Messages.Contains(assistant));
+        Assert.Contains(system, ctx.Messages);
+        Assert.Contains(assistant, ctx.Messages);
     }
 }

@@ -19,10 +19,11 @@ public sealed class ConditionalSequenceTests
             _id = id;
         }
 
-        public override void Execute(CleanupContext context)
+        public override bool Execute(CleanupContext context)
         {
             ExecuteCount++;
             _order.Add(_id);
+            return true;
         }
     }
 
@@ -31,7 +32,7 @@ public sealed class ConditionalSequenceTests
         return new CleanupContext(
             Condition.True(),
             new ContextState(Guid.NewGuid(), 50, 100),
-            messages
+            messages.ToList()
         );
     }
 

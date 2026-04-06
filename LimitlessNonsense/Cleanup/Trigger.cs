@@ -9,6 +9,12 @@ namespace LimitlessNonsense.Cleanup;
 [JsonDerivedType(typeof(Schedule), nameof(Cleanup.Schedule))]
 public abstract record Trigger
 {
+    /// <summary>
+    /// Unique ID of this trigger
+    /// </summary>
+    [JsonPropertyName("ID")]
+    public Guid ID { get; init; } = Guid.NewGuid();
+    
     #region static factories
     /// <summary>
     /// Always trigger

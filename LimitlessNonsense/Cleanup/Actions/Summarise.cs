@@ -7,7 +7,7 @@
 internal record Summarise(ushort Keep)
     : ContextAction
 {
-    public override void Execute(CleanupContext context)
+    public override bool Execute(CleanupContext context)
     {
         throw new NotImplementedException();
     }
