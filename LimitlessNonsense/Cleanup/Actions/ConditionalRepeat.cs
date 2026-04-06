@@ -6,14 +6,18 @@
 internal record ConditionalRepeat(ContextAction Action, uint MaxRepeats = 32)
     : ContextAction
 {
-    public override void Execute(CleanupContext context)
+    public override bool Execute(CleanupContext context)
     {
+        var changed = false;
+        
         for (var i = 0; i < MaxRepeats; i++)
         {
             if (!context.Condition.Evaluate(context.State))
-                return;
+                return changed;
 
-            Action.Execute(context);
+            changed |= Action.Execute(context);
         }
+
+        return changed;
     }
 }

@@ -26,8 +26,9 @@ public sealed class ConditionalRepeatTests
         const int maxRepeats = 3;
         var ctx = Context(Condition.True(), messageCount: 10);
 
-        ContextAction.Repeat(ContextAction.RemoveOldest(MessageRole.User), maxRepeats).Execute(ctx);
+        var changed = ContextAction.Repeat(ContextAction.RemoveOldest(MessageRole.User), maxRepeats).Execute(ctx);
 
+        Assert.IsTrue(changed);
         Assert.HasCount(10 - maxRepeats, ctx.Messages);
     }
 
@@ -39,9 +40,10 @@ public sealed class ConditionalRepeatTests
         var stateId = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
         var ctx = Context(Condition.Changed(), messageCount: 5, stateId: stateId);
 
-        ContextAction.Repeat(ContextAction.RemoveOldest(MessageRole.User), maxRepeats: 10).Execute(ctx);
+        var changed = ContextAction.Repeat(ContextAction.RemoveOldest(MessageRole.User), maxRepeats: 10).Execute(ctx);
 
         // Condition was true only on the first iteration, so exactly one message is removed
+        Assert.IsTrue(changed);
         Assert.HasCount(4, ctx.Messages);
     }
 
@@ -50,12 +52,14 @@ public sealed class ConditionalRepeatTests
     {
         // Always-false condition
         var ctx1 = Context(Condition.False(), messageCount: 5);
-        ContextAction.Repeat(ContextAction.RemoveOldest(MessageRole.User), maxRepeats: 10).Execute(ctx1);
+        var changed1 = ContextAction.Repeat(ContextAction.RemoveOldest(MessageRole.User), maxRepeats: 10).Execute(ctx1);
+        Assert.IsFalse(changed1);
         Assert.HasCount(5, ctx1.Messages);
 
         // Zero max repeats — loop body is never entered even when condition is always true
         var ctx2 = Context(Condition.True(), messageCount: 5);
-        ContextAction.Repeat(ContextAction.RemoveOldest(MessageRole.User), maxRepeats: 0).Execute(ctx2);
+        var changed2 = ContextAction.Repeat(ContextAction.RemoveOldest(MessageRole.User), maxRepeats: 0).Execute(ctx2);
+        Assert.IsFalse(changed2);
         Assert.HasCount(5, ctx2.Messages);
     }
 }

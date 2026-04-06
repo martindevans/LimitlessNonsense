@@ -19,10 +19,11 @@ public sealed class ConditionalSequenceTests
             _id = id;
         }
 
-        public override void Execute(CleanupContext context)
+        public override bool Execute(CleanupContext context)
         {
             ExecuteCount++;
             _order.Add(_id);
+            return true;
         }
     }
 
@@ -31,7 +32,7 @@ public sealed class ConditionalSequenceTests
         return new CleanupContext(
             Condition.True(),
             new ContextState(Guid.NewGuid(), 50, 100),
-            messages
+            messages.ToList()
         );
     }
 
@@ -48,8 +49,9 @@ public sealed class ConditionalSequenceTests
         var a3 = new TrackingAction(order, 3);
 
         var sequence = ContextAction.Sequence([a1, a2, a3]);
-        sequence.Execute(CreateContext());
+        var changed = sequence.Execute(CreateContext());
 
+        Assert.IsTrue(changed);
         Assert.AreEqual(1, a1.ExecuteCount);
         Assert.AreEqual(1, a2.ExecuteCount);
         Assert.AreEqual(1, a3.ExecuteCount);
@@ -60,7 +62,9 @@ public sealed class ConditionalSequenceTests
     public void Execute_EmptySequence_DoesNothing()
     {
         var sequence = ContextAction.Sequence([]);
-        sequence.Execute(CreateContext()); // Must not throw
+        var changed = sequence.Execute(CreateContext()); // Must not throw
+
+        Assert.IsFalse(changed);
     }
 
     [TestMethod]
@@ -75,8 +79,9 @@ public sealed class ConditionalSequenceTests
             ContextAction.RemoveOldest(MessageRole.User),
             ContextAction.RemoveOldest(MessageRole.User),
         ]);
-        sequence.Execute(ctx);
+        var changed = sequence.Execute(ctx);
 
+        Assert.IsTrue(changed);
         Assert.IsEmpty(ctx.Messages);
     }
 

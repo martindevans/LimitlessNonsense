@@ -81,5 +81,6 @@ public abstract record ContextAction
     /// <summary>
     /// Execute this action on the LLM context
     /// </summary>
-    public abstract void Execute(CleanupContext context);
+    /// <returns>True, if any changes were made</returns>
+    public abstract bool Execute(CleanupContext context);
 }

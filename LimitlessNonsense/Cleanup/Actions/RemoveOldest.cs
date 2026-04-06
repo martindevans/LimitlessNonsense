@@ -7,16 +7,18 @@
 internal record RemoveOldest(MessageRole Roles)
     : ContextAction
 {
-    public override void Execute(CleanupContext context)
+    public override bool Execute(CleanupContext context)
     {
         for (var i = 0; i < context.Messages.Count; i++)
         {
             var msg = context.Messages[i];
             if ((msg.Role & Roles) != 0)
             {
-                context.Remove(msg);
-                break;
+                context.Messages.RemoveAt(i);
+                return true;
             }
         }
+
+        return false;
     }
 }

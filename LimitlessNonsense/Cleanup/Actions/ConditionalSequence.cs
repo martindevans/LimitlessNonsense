@@ -6,9 +6,18 @@
 internal record ConditionalSequence(IReadOnlyList<ContextAction> Actions)
     : ContextAction
 {
-    public override void Execute(CleanupContext context)
+    public override bool Execute(CleanupContext context)
     {
+        var changed = false;
+
         for (var i = 0; i < Actions.Count; i++)
-            Actions[i].Execute(context);
+        {
+            if (!context.Condition.Evaluate(context.State))
+                break;
+            
+            changed |= Actions[i].Execute(context);
+        }
+
+        return changed;
     }
 }
