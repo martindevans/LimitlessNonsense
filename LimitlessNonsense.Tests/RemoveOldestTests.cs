@@ -24,8 +24,9 @@ public sealed class RemoveOldestTests
         var assistant = Message(MessageRole.Assistant);
         var ctx = Context(system, user, assistant);
 
-        ContextAction.RemoveOldest(MessageRole.User).Execute(ctx);
+        var changed = ContextAction.RemoveOldest(MessageRole.User).Execute(ctx);
 
+        Assert.IsTrue(changed);
         Assert.HasCount(2, ctx.Messages);
         Assert.DoesNotContain(user, ctx.Messages);
         Assert.Contains(system, ctx.Messages);
@@ -40,8 +41,9 @@ public sealed class RemoveOldestTests
         var user2 = Message(MessageRole.User);
         var ctx = Context(user1, assistant, user2);
 
-        ContextAction.RemoveOldest(MessageRole.User).Execute(ctx);
+        var changed = ContextAction.RemoveOldest(MessageRole.User).Execute(ctx);
 
+        Assert.IsTrue(changed);
         Assert.HasCount(2, ctx.Messages);
         Assert.DoesNotContain(user1, ctx.Messages);
         Assert.Contains(assistant, ctx.Messages);
@@ -56,8 +58,9 @@ public sealed class RemoveOldestTests
         var assistant = Message(MessageRole.Assistant);
         var ctx = Context(system, user, assistant);
 
-        ContextAction.RemoveOldest(MessageRole.User | MessageRole.Assistant).Execute(ctx);
+        var changed = ContextAction.RemoveOldest(MessageRole.User | MessageRole.Assistant).Execute(ctx);
 
+        Assert.IsTrue(changed);
         Assert.HasCount(2, ctx.Messages);
         Assert.DoesNotContain(user, ctx.Messages);
         Assert.Contains(system, ctx.Messages);
@@ -73,8 +76,9 @@ public sealed class RemoveOldestTests
     {
         var ctx = Context();
 
-        ContextAction.RemoveOldest(MessageRole.User).Execute(ctx);
+        var changed = ContextAction.RemoveOldest(MessageRole.User).Execute(ctx);
 
+        Assert.IsFalse(changed);
         Assert.IsEmpty(ctx.Messages);
     }
 
@@ -85,8 +89,9 @@ public sealed class RemoveOldestTests
         var assistant = Message(MessageRole.Assistant);
         var ctx = Context(system, assistant);
 
-        ContextAction.RemoveOldest(MessageRole.User).Execute(ctx);
+        var changed = ContextAction.RemoveOldest(MessageRole.User).Execute(ctx);
 
+        Assert.IsFalse(changed);
         Assert.HasCount(2, ctx.Messages);
         Assert.Contains(system, ctx.Messages);
         Assert.Contains(assistant, ctx.Messages);

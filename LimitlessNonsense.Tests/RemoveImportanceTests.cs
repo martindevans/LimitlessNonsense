@@ -29,9 +29,10 @@ public sealed class RemoveImportanceTests
 
         var action = ContextAction.ImportanceRemoval(Importance.Normal);
         var ctx = Context(veryHigh, high, normal, low, veryLow);
-        action.Execute(ctx);
+        var changed = action.Execute(ctx);
 
         // Normal, Low, VeryLow are at or below the threshold; VeryHigh and High remain
+        Assert.IsTrue(changed);
         Assert.HasCount(2, ctx.Messages);
         Assert.Contains(veryHigh, ctx.Messages);
         Assert.Contains(high, ctx.Messages);
@@ -50,8 +51,9 @@ public sealed class RemoveImportanceTests
 
         var action = ContextAction.ImportanceRemoval(Importance.Normal, depth: 2);
         var ctx = Context(old, recent1, recent2);
-        action.Execute(ctx);
+        var changed = action.Execute(ctx);
 
+        Assert.IsTrue(changed);
         Assert.HasCount(2, ctx.Messages);
         Assert.Contains(recent1, ctx.Messages);
         Assert.Contains(recent2, ctx.Messages);
@@ -67,8 +69,9 @@ public sealed class RemoveImportanceTests
         var action = ContextAction.ImportanceRemoval(Importance.Normal);
         var ctx = Context();
 
-        action.Execute(ctx);
+        var changed = action.Execute(ctx);
 
+        Assert.IsFalse(changed);
         Assert.IsEmpty(ctx.Messages);
     }
 
@@ -80,8 +83,9 @@ public sealed class RemoveImportanceTests
 
         var action = ContextAction.ImportanceRemoval(Importance.Normal, depth: 5);
         var ctx = Context(msg1, msg2);
-        action.Execute(ctx);
+        var changed = action.Execute(ctx);
 
+        Assert.IsFalse(changed);
         Assert.HasCount(2, ctx.Messages);
     }
 

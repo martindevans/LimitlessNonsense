@@ -24,8 +24,9 @@ public sealed class RemoveRoleTests
         var assistant = Msg(MessageRole.Assistant);
         var context = Context(user, assistant);
 
-        ContextAction.RemoveRole(MessageRole.User).Execute(context);
+        var changed = ContextAction.RemoveRole(MessageRole.User).Execute(context);
 
+        Assert.IsTrue(changed);
         CollectionAssert.DoesNotContain(context.Messages.ToList(), user);
         CollectionAssert.Contains(context.Messages.ToList(), assistant);
     }
@@ -36,8 +37,9 @@ public sealed class RemoveRoleTests
         var user = Msg(MessageRole.User);
         var context = Context(user);
 
-        ContextAction.RemoveRole(MessageRole.Assistant).Execute(context);
+        var changed = ContextAction.RemoveRole(MessageRole.Assistant).Execute(context);
 
+        Assert.IsFalse(changed);
         CollectionAssert.Contains(context.Messages.ToList(), user);
     }
 
@@ -46,8 +48,9 @@ public sealed class RemoveRoleTests
     {
         var context = Context();
 
-        ContextAction.RemoveRole(MessageRole.User).Execute(context);
+        var changed = ContextAction.RemoveRole(MessageRole.User).Execute(context);
 
+        Assert.IsFalse(changed);
         Assert.IsEmpty(context.Messages);
     }
 
@@ -63,8 +66,9 @@ public sealed class RemoveRoleTests
         var context = Context(buried, recent);
 
         // depth=1 protects the last 1 message (recent), but not the older one (buried)
-        ContextAction.RemoveRole(MessageRole.User, depth: 1).Execute(context);
+        var changed = ContextAction.RemoveRole(MessageRole.User, depth: 1).Execute(context);
 
+        Assert.IsTrue(changed);
         CollectionAssert.DoesNotContain(context.Messages.ToList(), buried);
         CollectionAssert.Contains(context.Messages.ToList(), recent);
     }
@@ -76,8 +80,9 @@ public sealed class RemoveRoleTests
         var msg2 = Msg(MessageRole.User);
         var context = Context(msg1, msg2);
 
-        ContextAction.RemoveRole(MessageRole.User, depth: 2).Execute(context);
+        var changed = ContextAction.RemoveRole(MessageRole.User, depth: 2).Execute(context);
 
+        Assert.IsFalse(changed);
         Assert.HasCount(2, context.Messages);
     }
 
@@ -87,8 +92,9 @@ public sealed class RemoveRoleTests
         var msg = Msg(MessageRole.User);
         var context = Context(msg);
 
-        ContextAction.RemoveRole(MessageRole.User, depth: 100).Execute(context);
+        var changed = ContextAction.RemoveRole(MessageRole.User, depth: 100).Execute(context);
 
+        Assert.IsFalse(changed);
         Assert.HasCount(1, context.Messages);
     }
 
@@ -104,8 +110,9 @@ public sealed class RemoveRoleTests
         var user = Msg(MessageRole.User);
         var context = Context(reasoning, tool, user);
 
-        ContextAction.RemoveRole(MessageRole.Reasoning | MessageRole.Tool).Execute(context);
+        var changed = ContextAction.RemoveRole(MessageRole.Reasoning | MessageRole.Tool).Execute(context);
 
+        Assert.IsTrue(changed);
         CollectionAssert.DoesNotContain(context.Messages.ToList(), reasoning);
         CollectionAssert.DoesNotContain(context.Messages.ToList(), tool);
         CollectionAssert.Contains(context.Messages.ToList(), user);
