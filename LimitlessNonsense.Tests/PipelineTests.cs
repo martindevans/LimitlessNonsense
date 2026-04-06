@@ -71,7 +71,7 @@ public sealed class PipelineTests
 
         pipeline.Apply(context);
 
-        Assert.AreEqual(2, contexts.Count);
+        Assert.HasCount(2, contexts);
         Assert.AreSame(context, contexts[0]);
         Assert.AreSame(context, contexts[1]);
     }
@@ -90,16 +90,17 @@ public sealed class PipelineTests
         Assert.IsFalse(secondCalled);
     }
 
-    // Middleware can execute logic after calling next
+    // Middleware can execute logic after calling next (synchronous continuation)
     [TestMethod]
     public void Apply_MiddlewarePostProcessing_RunsAfterDownstreamMiddleware()
     {
         var order = new List<string>();
-        var m1 = new LambdaMiddleware(async (ctx, next) =>
+        var m1 = new LambdaMiddleware((ctx, next) =>
         {
             order.Add("before");
-            await next(ctx);
+            var task = next(ctx);
             order.Add("after");
+            return task;
         });
         var m2 = new LambdaMiddleware((ctx, next) => { order.Add("inner"); return next(ctx); });
         var pipeline = new Pipeline(m1, m2);
