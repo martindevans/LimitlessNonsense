@@ -5,28 +5,27 @@
 /// </summary>
 public class Pipeline
 {
-    private readonly IMiddleware[] _middleware;
+    private readonly Func<MiddlewareContext, Task> _run;
 
     public Pipeline(params Span<IMiddleware> middleware)
     {
-        _middleware = middleware.ToArray();
+        var middleware1 = middleware.ToArray();
+
+        _run = _ => Task.CompletedTask;
+        for (var i = middleware1.Length - 1; i >= 0; i--)
+        {
+            var item = middleware1[i];
+
+            // Capture the current 'next' delegate
+            var currentNext = _run;
+
+            // Create a new 'next' delegate that calls the middleware's Process method
+            _run = ctx => item.Process(ctx, currentNext);
+        }
     }
 
     public void Apply(MiddlewareContext context)
     {
-        Func<MiddlewareContext, Task> next = _ => Task.CompletedTask;
-        for (var i = _middleware.Length - 1; i >= 0; i--)
-        {
-            var middleware = _middleware[i];
-            
-            // Capture the current 'next' delegate
-            var currentNext = next;
-            
-            // Create a new 'next' delegate that calls the middleware's Process method
-            next = ctx => middleware.Process(ctx, currentNext);
-        }
-
-        // Start the pipeline execution by calling the first middleware's Process method
-        next(context);
+        _run(context);
     }
 }
