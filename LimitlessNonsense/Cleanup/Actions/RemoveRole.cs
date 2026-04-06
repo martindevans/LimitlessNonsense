@@ -17,7 +17,10 @@ internal record RemoveRole(MessageRole Roles, ushort Depth)
             var msg = context.Messages[i];
 
             if ((msg.Role & Roles) != 0)
-                changed |= context.Messages.Remove(msg);
+            {
+                context.Messages.RemoveAt(i);
+                changed = true;
+            }
         }
 
         return changed;
