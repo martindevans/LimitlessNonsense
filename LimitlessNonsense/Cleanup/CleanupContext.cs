@@ -15,7 +15,7 @@ public record CleanupContext
     public List<ContextMessage> Messages { get; private set; }
 
     /// <summary>Service provider</summary>
-    public IServiceProvider Services { get; init; }
+    public IServiceProvider? Services { get; init; }
 
     /// <summary>
     /// LLM context handle used for applying policy changes
@@ -24,7 +24,7 @@ public record CleanupContext
     /// <param name="state">State of the context</param>
     /// <param name="messages">List of messages in the context</param>
     /// <param name="services"></param>
-    public CleanupContext(Condition condition, ContextState state, List<ContextMessage> messages, IServiceProvider services)
+    public CleanupContext(Condition condition, ContextState state, List<ContextMessage> messages, IServiceProvider? services = null)
     {
         Condition = condition;
         State = state;
