@@ -27,7 +27,7 @@ public abstract record ContextAction
     }
 
     /// <summary>
-    /// Run a sequence of actions
+    /// Run a sequence of actions, terminating the sequence as soon as the condition is false
     /// </summary>
     /// <param name="actions"></param>
     /// <returns></returns>

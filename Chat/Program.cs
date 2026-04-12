@@ -9,30 +9,20 @@ using static LimitlessNonsense.Cleanup.Actions.ContextAction;
 
 var policies = new CleanupPolicy[]
 {
-    // Sweep away low priority messages
+    // After every message do some cleanup
     new(
         Always(),
         True(),
-        ImportanceRemoval(Importance.VeryLow, depth: 8)
-    ),
-
-    // Remove buried reasoning messages
-    new(
-        Idle(TimeSpan.FromMinutes(1)),
-        True(),
-        RemoveRole(MessageRole.Reasoning, depth: 8)
-    ),
-
-    // Remove buried tool calls
-    new(
-        Idle(TimeSpan.FromMinutes(1)),
-        True(),
-        RemoveRole(MessageRole.Tool, depth: 8)
+        Sequence([
+            ImportanceRemoval(Importance.VeryLow, depth: 8),
+            RemoveRole(MessageRole.Reasoning, depth: 8),
+            RemoveRole(MessageRole.Tool, depth: 8)
+        ])
     ),
 
     // Summarise when idle for a short time to save space
     new(
-        Idle(TimeSpan.FromMinutes(3)),
+        Idle(TimeSpan.FromMinutes(7)),
         ContextFillFactor(0.75) & Changed(),
         Summarise(keep: 8)
     ),
@@ -50,7 +40,7 @@ var policies = new CleanupPolicy[]
         ContextFillFactor(0.9),
         Sequence([
             RemoveRole(MessageRole.Reasoning, depth: 2),
-            RemoveRole(MessageRole.Tool, depth: 2),
+            RemoveRole(MessageRole.Tool, depth: 4),
             ImportanceRemoval(Importance.VeryLow, depth: 2),
             ImportanceRemoval(Importance.Low, depth: 4),
             ImportanceRemoval(Importance.Normal, depth: 6),
