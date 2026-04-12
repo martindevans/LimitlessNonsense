@@ -1,4 +1,6 @@
-﻿namespace LimitlessNonsense.Cleanup;
+﻿using LimitlessNonsense.Cleanup.Actions;
+
+namespace LimitlessNonsense.Cleanup;
 
 /// <summary>
 /// LLM context handle used for applying policy changes
@@ -16,6 +18,9 @@ public record CleanupContext
 
     /// <summary>Service provider</summary>
     public IServiceProvider? Services { get; init; }
+
+    /// <summary>The currently in-flight summarisation task, if any</summary>
+    public SummarisationTask? ActiveSummarisationTask { get; set; }
 
     /// <summary>
     /// LLM context handle used for applying policy changes

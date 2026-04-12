@@ -14,13 +14,8 @@ internal record BeginSummarise(ushort Keep)
         if (provider == null)
             return false;
 
-        // Get summary service, if there isn't one early exit
-        var service = (SummarisationService?)context.Services?.GetService(typeof(SummarisationService));
-        if (service == null)
-            return false;
-
         // Check if there's a summarisation already in progress, if so do nothing
-        if (service.GetActiveTask() != null)
+        if (context.ActiveSummarisationTask != null)
             return false;
 
         // Select messages to summarise: all non-system messages except the last `Keep` ones
@@ -41,11 +36,10 @@ internal record BeginSummarise(ushort Keep)
         var task = provider.Summarise(transcript);
 
         // Store in-flight summarisation task into slot
-        var summarisationTask = new SummarisationTask(
+        context.ActiveSummarisationTask = new SummarisationTask(
             messagesToSummarise.Select(m => (m.ID, m.Role)).ToList(),
             task,
             cts);
-        service.SetActiveTask(summarisationTask);
 
         return true;
     }
@@ -60,13 +54,8 @@ internal record EndSummarise(bool Block)
 {
     public override bool Execute(CleanupContext context)
     {
-        // Get summary service, if there isn't one early exit
-        var service = (SummarisationService?)context.Services?.GetService(typeof(SummarisationService));
-        if (service == null)
-            return false;
-
         // Check slot for in-flight summarisation
-        var activeTask = service.GetActiveTask();
+        var activeTask = context.ActiveSummarisationTask;
         if (activeTask == null)
             return false;
 
@@ -87,7 +76,7 @@ internal record EndSummarise(bool Block)
             .ToList();
 
         // Clear the slot regardless of whether messages were found
-        service.SetActiveTask(null);
+        context.ActiveSummarisationTask = null;
 
         if (existingMessages.Count == 0)
             return false;
