@@ -71,23 +71,21 @@ public abstract record ContextAction
     /// <summary>
     /// Summarise the entire conversation, except for some messages at the end.
     /// </summary>
-    /// <param name="slot"></param>
     /// <param name="keep"></param>
     /// <returns></returns>
-    public static ContextAction BeginSummarise(SummarySlot slot, ushort keep = 4)
+    public static ContextAction BeginSummarise(ushort keep = 4)
     {
-        return new BeginSummarise(slot, keep);
+        return new BeginSummarise(keep);
     }
 
     /// <summary>
     /// Apply summarisation to context.
     /// </summary>
-    /// <param name="slot"></param>
     /// <param name="block"></param>
     /// <returns></returns>
-    public static ContextAction EndSummarise(SummarySlot slot, bool block)
+    public static ContextAction EndSummarise(bool block)
     {
-        return new EndSummarise(slot, block);
+        return new EndSummarise(block);
     }
     #endregion
 

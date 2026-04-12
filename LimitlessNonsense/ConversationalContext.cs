@@ -197,6 +197,7 @@ public sealed record ContextMessage
 }
 
 [Flags]
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum MessageRole
 {
     System = 1,
@@ -208,6 +209,7 @@ public enum MessageRole
 }
 
 public enum Importance
+    : long
 {
     VeryHigh = 2,
     High = 1,

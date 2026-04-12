@@ -2,12 +2,9 @@
 using System.Text.Json.Serialization;
 using LimitlessNonsense;
 using LimitlessNonsense.Cleanup;
-using LimitlessNonsense.Cleanup.Actions;
 using static LimitlessNonsense.Cleanup.Trigger;
 using static LimitlessNonsense.Cleanup.Condition;
 using static LimitlessNonsense.Cleanup.Actions.ContextAction;
-
-var slot = new SummarySlot();
 
 var policies = new CleanupPolicy[]
 {
@@ -15,7 +12,7 @@ var policies = new CleanupPolicy[]
     new(
         Always(),
         True(),
-        EndSummarise(slot, block:false)
+        EndSummarise(block:false)
     ),
     
     // After every message do some cleanup
@@ -34,8 +31,8 @@ var policies = new CleanupPolicy[]
         Idle(TimeSpan.FromMinutes(7)),
         ContextFillFactor(0.75) & Changed(),
         Sequence([
-            BeginSummarise(slot, keep: 8),
-            EndSummarise(slot, block:false)
+            BeginSummarise(keep: 8),
+            EndSummarise(block:false)
         ])
     ),
 
@@ -44,8 +41,8 @@ var policies = new CleanupPolicy[]
         Idle(TimeSpan.FromHours(1)),
         Changed(),
         Sequence([
-            BeginSummarise(slot, keep: 0),
-            EndSummarise(slot, block:false)
+            BeginSummarise(keep: 0),
+            EndSummarise(block:false)
         ])
     ),
 
@@ -54,15 +51,15 @@ var policies = new CleanupPolicy[]
         Always(),
         ContextFillFactor(0.95),
         Sequence([
-            EndSummarise(slot, block:true),
+            EndSummarise(block:true),
             RemoveRole(MessageRole.Reasoning, depth: 2),
             RemoveRole(MessageRole.Tool, depth: 4),
             ImportanceRemoval(Importance.VeryLow, depth: 2),
             ImportanceRemoval(Importance.Low, depth: 4),
             ImportanceRemoval(Importance.Normal, depth: 6),
             RemoveRole(MessageRole.Reasoning | MessageRole.Tool, depth: 0),
-            BeginSummarise(slot, keep: 4),
-            EndSummarise(slot, block:true),
+            BeginSummarise(keep: 2),
+            EndSummarise(block:true),
             ImportanceRemoval(Importance.VeryLow, depth: 0),
             ImportanceRemoval(Importance.Low, depth: 0),
             ImportanceRemoval(Importance.Normal, depth: 0),
@@ -73,13 +70,16 @@ var policies = new CleanupPolicy[]
     ),
 };
 
-var json = JsonSerializer.Serialize(policies, new JsonSerializerOptions
+var options = new JsonSerializerOptions
 {
     WriteIndented = true,
     Converters =
     {
         new JsonStringEnumConverter(),
-    }
-});
+    },
+    PropertyNameCaseInsensitive = true
+};
+
+var json = JsonSerializer.Serialize(policies, options);
 Console.WriteLine(json);
-var output = JsonSerializer.Deserialize<ContextAction[]>(json);
+var output = JsonSerializer.Deserialize<CleanupPolicy[]>(json, options);
