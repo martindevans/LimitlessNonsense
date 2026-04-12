@@ -1,4 +1,6 @@
-﻿namespace LimitlessNonsense.Cleanup.Actions;
+﻿using System.Text.Json.Serialization;
+
+namespace LimitlessNonsense.Cleanup.Actions;
 
 /// <summary>
 /// Remove messages at or below the given importance threshold which are buried over a certain depth

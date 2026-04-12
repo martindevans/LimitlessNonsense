@@ -8,10 +8,11 @@ namespace LimitlessNonsense.Cleanup.Actions;
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
 [JsonDerivedType(typeof(ConditionalRepeat), nameof(ConditionalRepeat))]
 [JsonDerivedType(typeof(ConditionalSequence), nameof(ConditionalSequence))]
-[JsonDerivedType(typeof(RemoveImportance), nameof(Actions.RemoveImportance))]
+[JsonDerivedType(typeof(RemoveImportance), nameof(RemoveImportance))]
 [JsonDerivedType(typeof(RemoveOldest), nameof(Actions.RemoveOldest))]
 [JsonDerivedType(typeof(RemoveRole), nameof(Actions.RemoveRole))]
-[JsonDerivedType(typeof(Summarise), nameof(Actions.Summarise))]
+[JsonDerivedType(typeof(BeginSummarise), nameof(Actions.BeginSummarise))]
+[JsonDerivedType(typeof(EndSummarise), nameof(Actions.EndSummarise))]
 public abstract record ContextAction
 {
     #region static factories
@@ -72,9 +73,19 @@ public abstract record ContextAction
     /// </summary>
     /// <param name="keep"></param>
     /// <returns></returns>
-    public static ContextAction Summarise(ushort keep = 4)
+    public static ContextAction BeginSummarise(ushort keep = 4)
     {
-        return new Summarise(keep);
+        return new BeginSummarise(keep);
+    }
+
+    /// <summary>
+    /// Apply summarisation to context.
+    /// </summary>
+    /// <param name="block"></param>
+    /// <returns></returns>
+    public static ContextAction EndSummarise(bool block)
+    {
+        return new EndSummarise(block);
     }
     #endregion
 

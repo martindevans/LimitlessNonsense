@@ -1,4 +1,6 @@
-﻿namespace LimitlessNonsense.Cleanup.Actions;
+﻿using System.Text.Json.Serialization;
+
+namespace LimitlessNonsense.Cleanup.Actions;
 
 /// <summary>
 /// Remove messages with the given role that are buried over a certain depth

@@ -1,4 +1,6 @@
-﻿namespace LimitlessNonsense.Cleanup.Actions;
+﻿using System.Text.Json.Serialization;
+
+namespace LimitlessNonsense.Cleanup.Actions;
 
 /// <summary>
 /// The the oldest message which has any of the given roles
