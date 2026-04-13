@@ -85,6 +85,7 @@ internal record EndSummarise(bool Block)
         try
         {
             summary = await summaryTask.Task;
+            summaryTask.Dispose();
         }
         catch (TaskCanceledException)
         {
@@ -117,6 +118,7 @@ internal record EndSummarise(bool Block)
 }
 
 public class SummarisationTask
+    : IAsyncDisposable
 {
     /// <summary>
     /// The messages which are being summarised
@@ -138,5 +140,10 @@ public class SummarisationTask
         Messages = messages;
         Task = task;
         Cancellation = cancellation;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        Cancellation.Dispose();
     }
 }
