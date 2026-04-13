@@ -81,9 +81,10 @@ internal record EndSummarise(bool Block)
         context.ActiveSummarisationTask = null;
 
         // Wait for completion
+        string summary;
         try
         {
-            await summaryTask.Task;
+            summary = await summaryTask.Task;
         }
         catch (TaskCanceledException)
         {
@@ -108,7 +109,7 @@ internal record EndSummarise(bool Block)
             context.Messages.Remove(msg);
         
         // Insert summary
-        var summaryMessage = new ContextMessage(MessageRole.Summary, content: await summaryTask.Task);
+        var summaryMessage = new ContextMessage(MessageRole.Summary, content: summary);
         context.Messages.Insert(Math.Min(firstIndex, context.Messages.Count), summaryMessage);
 
         return true;
