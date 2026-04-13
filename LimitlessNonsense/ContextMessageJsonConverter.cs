@@ -4,7 +4,8 @@ using System.Text.Json.Serialization;
 
 namespace LimitlessNonsense;
 
-internal sealed class ContextMessageJsonConverter : JsonConverter<ContextMessage>
+internal sealed class ContextMessageJsonConverter
+    : JsonConverter<ContextMessage>
 {
     public override ContextMessage Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {

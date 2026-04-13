@@ -1,7 +1,11 @@
 ﻿using System.Text.Json;
-using System.Text.Json.Serialization;
 using LimitlessNonsense;
 using LimitlessNonsense.Cleanup;
+using LimitlessNonsense.Metadata;
+using LimitlessNonsense.Middleware;
+using LimitlessNonsense.Middleware.Metadata;
+using LimitlessNonsense.Middleware.Metadata.Add;
+using LimitlessNonsense.Middleware.Time;
 using static LimitlessNonsense.Cleanup.Trigger;
 using static LimitlessNonsense.Cleanup.Condition;
 using static LimitlessNonsense.Cleanup.Actions.ContextAction;
@@ -73,13 +77,35 @@ var policies = new CleanupPolicy[]
 var options = new JsonSerializerOptions
 {
     WriteIndented = true,
-    Converters =
-    {
-        new JsonStringEnumConverter(),
-    },
     PropertyNameCaseInsensitive = true
 };
 
 var json = JsonSerializer.Serialize(policies, options);
 Console.WriteLine(json);
 var output = JsonSerializer.Deserialize<CleanupPolicy[]>(json, options);
+
+var pipeline = new Pipeline([
+    new AddMessageCreationTimeMetadata(),
+    new DateChangedMessage(),
+    new ElapsedTimeMessage(TimeSpan.FromMinutes(10)),
+    new AddMessageCreationTimePrefix(),
+    new AddMessageSenderPrefix()
+]);
+    
+
+
+
+var sys = new ContextMessage(MessageRole.System, Importance.VeryHigh, "System Prompt", Guid.NewGuid());
+sys.SetMetadata(new MessageCreationTime(DateTime.UtcNow - TimeSpan.FromMinutes(30)));
+
+var ctx = new MiddlewareContext(
+    [
+        sys
+    ],
+    DateTime.UtcNow,
+    new ContextMessage(MessageRole.User, Importance.Normal, "Hi")
+);
+
+pipeline.Apply(ctx);
+
+Console.WriteLine(ctx);

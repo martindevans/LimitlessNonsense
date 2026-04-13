@@ -2,7 +2,7 @@
 
 public sealed class MiddlewareContext
 {
-    internal MiddlewareContext(List<ContextMessage> history, DateTime now, ContextMessage message)
+    public MiddlewareContext(List<ContextMessage> history, DateTime now, ContextMessage message)
     {
         History = history;
         UtcNow = now;

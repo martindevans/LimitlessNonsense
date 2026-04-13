@@ -24,6 +24,10 @@ public class Pipeline
         }
     }
 
+    /// <summary>
+    /// Apply this pipeline to a context
+    /// </summary>
+    /// <param name="context"></param>
     public void Apply(MiddlewareContext context)
     {
         _run(context);
