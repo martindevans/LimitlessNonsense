@@ -85,7 +85,7 @@ internal record EndSummarise(bool Block)
         try
         {
             summary = await summaryTask.Task;
-            summaryTask.Dispose();
+            await summaryTask.DisposeAsync();
         }
         catch (TaskCanceledException)
         {
@@ -131,7 +131,7 @@ public class SummarisationTask
     public Task<string> Task { get; }
 
     /// <summary>
-    /// aCan be used to cancel <see cref="Task"/>
+    /// Can be used to cancel <see cref="Task"/>
     /// </summary>
     public CancellationTokenSource Cancellation { get; }
 
