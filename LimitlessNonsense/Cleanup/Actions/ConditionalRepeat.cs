@@ -6,7 +6,7 @@
 internal record ConditionalRepeat(ContextAction Action, uint MaxRepeats = 32)
     : ContextAction
 {
-    public override bool Execute(CleanupContext context)
+    public override async Task<bool> Execute(CleanupContext context)
     {
         var changed = false;
         
@@ -15,7 +15,7 @@ internal record ConditionalRepeat(ContextAction Action, uint MaxRepeats = 32)
             if (!context.Condition.Evaluate(context.State))
                 return changed;
 
-            changed |= Action.Execute(context);
+            changed |= await Action.Execute(context);
         }
 
         return changed;

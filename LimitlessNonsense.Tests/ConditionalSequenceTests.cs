@@ -19,7 +19,7 @@ public sealed class ConditionalSequenceTests
             _id = id;
         }
 
-        public override bool Execute(CleanupContext context)
+        public override async Task<bool> Execute(CleanupContext context)
         {
             ExecuteCount++;
             _order.Add(_id);
@@ -41,7 +41,7 @@ public sealed class ConditionalSequenceTests
     // -------------------------------------------------------------------------
 
     [TestMethod]
-    public void Execute_RunsAllActionsInOrder()
+    public async Task Execute_RunsAllActionsInOrder()
     {
         var order = new List<int>();
         var a1 = new TrackingAction(order, 1);
@@ -49,7 +49,7 @@ public sealed class ConditionalSequenceTests
         var a3 = new TrackingAction(order, 3);
 
         var sequence = ContextAction.Sequence([a1, a2, a3]);
-        var changed = sequence.Execute(CreateContext());
+        var changed = await sequence.Execute(CreateContext());
 
         Assert.IsTrue(changed);
         Assert.AreEqual(1, a1.ExecuteCount);
@@ -59,16 +59,16 @@ public sealed class ConditionalSequenceTests
     }
 
     [TestMethod]
-    public void Execute_EmptySequence_DoesNothing()
+    public async Task Execute_EmptySequence_DoesNothing()
     {
         var sequence = ContextAction.Sequence([]);
-        var changed = sequence.Execute(CreateContext()); // Must not throw
+        var changed = await sequence.Execute(CreateContext()); // Must not throw
 
         Assert.IsFalse(changed);
     }
 
     [TestMethod]
-    public void Execute_ContextModificationsPropagate_BetweenActions()
+    public async Task Execute_ContextModificationsPropagate_BetweenActions()
     {
         var msg1 = new ContextMessage(MessageRole.User);
         var msg2 = new ContextMessage(MessageRole.User);
@@ -79,7 +79,7 @@ public sealed class ConditionalSequenceTests
             ContextAction.RemoveOldest(MessageRole.User),
             ContextAction.RemoveOldest(MessageRole.User),
         ]);
-        var changed = sequence.Execute(ctx);
+        var changed = await sequence.Execute(ctx);
 
         Assert.IsTrue(changed);
         Assert.IsEmpty(ctx.Messages);

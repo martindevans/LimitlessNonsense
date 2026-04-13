@@ -18,7 +18,7 @@ public sealed class RemoveImportanceTests
     // -------------------------------------------------------------------------
 
     [TestMethod]
-    public void Execute_RemovesMessagesAtOrBelowThreshold()
+    public async Task Execute_RemovesMessagesAtOrBelowThreshold()
     {
         // Also exercises ContextAction.ImportanceRemoval factory method
         var veryHigh = Msg(Importance.VeryHigh);
@@ -29,7 +29,7 @@ public sealed class RemoveImportanceTests
 
         var action = ContextAction.ImportanceRemoval(Importance.Normal);
         var ctx = Context(veryHigh, high, normal, low, veryLow);
-        var changed = action.Execute(ctx);
+        var changed = await action.Execute(ctx);
 
         // Normal, Low, VeryLow are at or below the threshold; VeryHigh and High remain
         Assert.IsTrue(changed);
@@ -43,7 +43,7 @@ public sealed class RemoveImportanceTests
     // -------------------------------------------------------------------------
 
     [TestMethod]
-    public void Execute_Depth_ProtectsRecentMessages()
+    public async Task Execute_Depth_ProtectsRecentMessages()
     {
         var old     = Msg(Importance.VeryLow); // index 0 — buried, should be removed
         var recent1 = Msg(Importance.VeryLow); // index 1 — within depth, protected
@@ -51,7 +51,7 @@ public sealed class RemoveImportanceTests
 
         var action = ContextAction.ImportanceRemoval(Importance.Normal, depth: 2);
         var ctx = Context(old, recent1, recent2);
-        var changed = action.Execute(ctx);
+        var changed = await action.Execute(ctx);
 
         Assert.IsTrue(changed);
         Assert.HasCount(2, ctx.Messages);
@@ -64,26 +64,26 @@ public sealed class RemoveImportanceTests
     // -------------------------------------------------------------------------
 
     [TestMethod]
-    public void Execute_EmptyMessages_DoesNotThrow()
+    public async Task Execute_EmptyMessages_DoesNotThrow()
     {
         var action = ContextAction.ImportanceRemoval(Importance.Normal);
         var ctx = Context();
 
-        var changed = action.Execute(ctx);
+        var changed = await action.Execute(ctx);
 
         Assert.IsFalse(changed);
         Assert.IsEmpty(ctx.Messages);
     }
 
     [TestMethod]
-    public void Execute_DepthExceedsCount_RemovesNothing()
+    public async Task Execute_DepthExceedsCount_RemovesNothing()
     {
         var msg1 = Msg(Importance.VeryLow);
         var msg2 = Msg(Importance.VeryLow);
 
         var action = ContextAction.ImportanceRemoval(Importance.Normal, depth: 5);
         var ctx = Context(msg1, msg2);
-        var changed = action.Execute(ctx);
+        var changed = await action.Execute(ctx);
 
         Assert.IsFalse(changed);
         Assert.HasCount(2, ctx.Messages);

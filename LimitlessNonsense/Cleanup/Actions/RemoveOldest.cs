@@ -9,7 +9,7 @@ namespace LimitlessNonsense.Cleanup.Actions;
 internal record RemoveOldest(MessageRole Roles)
     : ContextAction
 {
-    public override bool Execute(CleanupContext context)
+    public override async Task<bool> Execute(CleanupContext context)
     {
         for (var i = 0; i < context.Messages.Count; i++)
         {

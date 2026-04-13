@@ -3,45 +3,59 @@
 /// <summary>
 /// Begin automatically summarising the context, keeping some of the most recent messages at the end.
 /// </summary>
-/// <param name="Keep"></param>
-internal record BeginSummarise(ushort Keep)
+/// <param name="KeepStart"></param>
+/// <param name="KeepEnd"></param>
+/// <param name="PreserveSystemStart">Skip `System` role messages at the start</param>
+/// <param name="DeleteRoles">Messages with this role in the range will be ignored in the summary and deleted when the summary is swapped in</param>
+internal record BeginSummarise(ushort KeepStart, ushort KeepEnd, bool PreserveSystemStart, MessageRole DeleteRoles)
     : ContextAction
 {
-    public override bool Execute(CleanupContext context)
+    public override async Task<bool> Execute(CleanupContext context)
     {
-        // Get summary system, if there isn't one early exit
+        // Early exit if there's already an in-flight summary task
+        if (context.ActiveSummarisationTask != null)
+            return false;
+
+        // Get summary system
         var provider = (ISummarisationProvider?)context.Services?.GetService(typeof(ISummarisationProvider));
         if (provider == null)
             return false;
 
-        // Check if there's a summarisation already in progress, if so do nothing
-        if (context.ActiveSummarisationTask != null)
-            return false;
-
-        // Select messages to summarise: all non-system messages except the last `Keep` ones
-        var messagesToSummarise = context.Messages
-            .Where(m => (m.Role & MessageRole.System) == 0)
-            .SkipLast(Keep)
+        // Select all messages in the range defined by keep start/end
+        var messagesInRange = context.Messages
+            .Skip(KeepStart)
+            .SkipLast(KeepEnd)
             .ToList();
 
-        if (messagesToSummarise.Count == 0)
-            return false;
+        // Remove system role messages at the start
+        if (PreserveSystemStart)
+            while (messagesInRange.Count > 0 && messagesInRange[0].Role == MessageRole.System)
+                messagesInRange.RemoveAt(0);
 
-        // Create transcript from messages
-        var transcript = string.Join("\n", messagesToSummarise
-            .Select(m => $"{m.Role}: {m.Prefix}{m.Content}{m.Suffix}"));
+        // Early exit if there's no work to do
+        if (messagesInRange.Count == 0)
+            return false;
+        
+        // Create transcript of relevant messages
+        var transcript = string.Join("\n",
+            messagesInRange
+               .Where(m => (m.Role & DeleteRoles) == 0)
+               .Select(m => $"{m.Prefix}{m.Content}{m.Suffix}")
+        );
 
         // Begin summarisation
         var cts = new CancellationTokenSource();
-        var task = provider.Summarise(transcript);
+        var task = provider.Summarise(transcript, cts.Token);
 
         // Store in-flight summarisation task into slot
         context.ActiveSummarisationTask = new SummarisationTask(
-            messagesToSummarise.Select(m => (m.ID, m.Role)).ToList(),
+            messagesInRange.Select(static m => m.ID).ToList(),
             task,
-            cts);
+            cts
+        );
 
-        return true;
+        // We didn't change the context, so return false
+        return false;
     }
 }
 
@@ -52,43 +66,53 @@ internal record BeginSummarise(ushort Keep)
 internal record EndSummarise(bool Block)
     : ContextAction
 {
-    public override bool Execute(CleanupContext context)
+    public override async Task<bool> Execute(CleanupContext context)
     {
         // Check slot for in-flight summarisation
-        var activeTask = context.ActiveSummarisationTask;
-        if (activeTask == null)
+        var summaryTask = context.ActiveSummarisationTask;
+        if (summaryTask == null)
             return false;
 
-        // Block if requested
-        if (Block)
-            activeTask.Task.GetAwaiter().GetResult();
+        // Wait for completion
+        if (Block || summaryTask.Task.IsCompleted)
+        {
+            // Clear the slot, we're about to consume this task
+            context.ActiveSummarisationTask = null;
+
+            // Wait for completion
+            try
+            {
+                await summaryTask.Task;
+            }
+            catch (TaskCanceledException)
+            {
+                return false;
+            }
+        }
 
         // If task is not yet complete, nothing to do yet
-        if (!activeTask.Task.IsCompleted)
+        if (!summaryTask.Task.IsCompleted)
             return false;
 
-        var summary = activeTask.Task.GetAwaiter().GetResult();
-
         // Check if the original messages still exist
-        var messageIds = activeTask.Messages.Select(m => m.ID).ToHashSet();
+        var messageIds = summaryTask.Messages.ToHashSet();
         var existingMessages = context.Messages
             .Where(m => messageIds.Contains(m.ID))
             .ToList();
 
-        // Clear the slot regardless of whether messages were found
-        context.ActiveSummarisationTask = null;
-
+        // Check that the message that were included in the summary still exist
         if (existingMessages.Count == 0)
             return false;
 
-        // Find the position of the first original message to determine where to insert the summary
+        // Find the position of the first original message
         var firstIndex = context.Messages.IndexOf(existingMessages[0]);
 
-        // If they do, replace them with the summary
+        // Remove all messages that were included in summary
         foreach (var msg in existingMessages)
             context.Messages.Remove(msg);
-
-        var summaryMessage = new ContextMessage(MessageRole.Summary, content: summary);
+        
+        // Insert summary
+        var summaryMessage = new ContextMessage(MessageRole.Summary, content: await summaryTask.Task);
         context.Messages.Insert(Math.Min(firstIndex, context.Messages.Count), summaryMessage);
 
         return true;
@@ -100,7 +124,7 @@ public class SummarisationTask
     /// <summary>
     /// The messages which are being summarised
     /// </summary>
-    public IReadOnlyList<(Guid ID, MessageRole Role)> Messages { get; }
+    public IReadOnlyList<Guid> Messages { get; }
 
     /// <summary>
     /// The task that will eventually produce a summary
@@ -112,7 +136,7 @@ public class SummarisationTask
     /// </summary>
     public CancellationTokenSource Cancellation { get; }
 
-    internal SummarisationTask(IReadOnlyList<(Guid ID, MessageRole Role)> messages, Task<string> task, CancellationTokenSource cancellation)
+    internal SummarisationTask(IReadOnlyList<Guid> messages, Task<string> task, CancellationTokenSource cancellation)
     {
         Messages = messages;
         Task = task;

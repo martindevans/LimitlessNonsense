@@ -4,10 +4,10 @@ namespace LimitlessNonsense.Cleanup;
 
 public sealed record CleanupPolicy(Trigger Trigger, Condition Condition, ContextAction Action)
 {
-    public bool Execute(ContextState state, List<ContextMessage> messages, IServiceProvider? services = null)
+    public async Task<bool> Execute(ContextState state, List<ContextMessage> messages, IServiceProvider? services = null)
     {
         if (Condition.Evaluate(state))
-            return Action.Execute(new CleanupContext(Condition, state, messages, services));
+            return await Action.Execute(new CleanupContext(Condition, state, messages, services));
         return false;
     }
 }

@@ -10,7 +10,7 @@ namespace LimitlessNonsense.Cleanup.Actions;
 internal record RemoveRole(MessageRole Roles, ushort Depth)
     : ContextAction
 {
-    public override bool Execute(CleanupContext context)
+    public override async Task<bool> Execute(CleanupContext context)
     {
         var changed = false;
         

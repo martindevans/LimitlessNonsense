@@ -31,7 +31,7 @@ var policies = new CleanupPolicy[]
         Idle(TimeSpan.FromMinutes(7)),
         ContextFillFactor(0.75) & Changed(),
         Sequence([
-            BeginSummarise(keep: 8),
+            BeginSummarise(keepEnd: 8),
             EndSummarise(block:false)
         ])
     ),
@@ -41,7 +41,7 @@ var policies = new CleanupPolicy[]
         Idle(TimeSpan.FromHours(1)),
         Changed(),
         Sequence([
-            BeginSummarise(keep: 0),
+            BeginSummarise(keepStart: 0, keepEnd: 0),
             EndSummarise(block:false)
         ])
     ),
@@ -58,7 +58,7 @@ var policies = new CleanupPolicy[]
             ImportanceRemoval(Importance.Low, depth: 4),
             ImportanceRemoval(Importance.Normal, depth: 6),
             RemoveRole(MessageRole.Reasoning | MessageRole.Tool, depth: 0),
-            BeginSummarise(keep: 2),
+            BeginSummarise(keepEnd:2),
             EndSummarise(block:true),
             ImportanceRemoval(Importance.VeryLow, depth: 0),
             ImportanceRemoval(Importance.Low, depth: 0),
