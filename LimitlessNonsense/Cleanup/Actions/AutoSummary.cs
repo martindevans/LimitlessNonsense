@@ -73,26 +73,22 @@ internal record EndSummarise(bool Block)
         if (summaryTask == null)
             return false;
 
-        // Wait for completion
-        if (Block || summaryTask.Task.IsCompleted)
-        {
-            // Clear the slot, we're about to consume this task
-            context.ActiveSummarisationTask = null;
-
-            // Wait for completion
-            try
-            {
-                await summaryTask.Task;
-            }
-            catch (TaskCanceledException)
-            {
-                return false;
-            }
-        }
-
-        // If task is not yet complete, nothing to do yet
-        if (!summaryTask.Task.IsCompleted)
+        // Early exit if task is still in flight
+        if (!summaryTask.Task.IsCompleted && !Block)
             return false;
+        
+        // Clear the slot, we're about to consume this task
+        context.ActiveSummarisationTask = null;
+
+        // Wait for completion
+        try
+        {
+            await summaryTask.Task;
+        }
+        catch (TaskCanceledException)
+        {
+            return false;
+        }
 
         // Check if the original messages still exist
         var messageIds = summaryTask.Messages.ToHashSet();
