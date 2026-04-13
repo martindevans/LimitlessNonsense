@@ -6,7 +6,7 @@
 internal record ConditionalSequence(IReadOnlyList<ContextAction> Actions)
     : ContextAction
 {
-    public override bool Execute(CleanupContext context)
+    public override async Task<bool> Execute(CleanupContext context)
     {
         var changed = false;
 
@@ -15,7 +15,7 @@ internal record ConditionalSequence(IReadOnlyList<ContextAction> Actions)
             if (!context.Condition.Evaluate(context.State))
                 break;
             
-            changed |= Actions[i].Execute(context);
+            changed |= await Actions[i].Execute(context);
         }
 
         return changed;

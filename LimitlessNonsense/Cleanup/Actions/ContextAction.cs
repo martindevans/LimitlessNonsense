@@ -71,11 +71,18 @@ public abstract record ContextAction
     /// <summary>
     /// Summarise the entire conversation, except for some messages at the end.
     /// </summary>
-    /// <param name="keep"></param>
+    /// <param name="deleteRoles"></param>
+    /// <param name="preserveSystemStart"></param>
+    /// <param name="keepStart"></param>
+    /// <param name="keepEnd"></param>
     /// <returns></returns>
-    public static ContextAction BeginSummarise(ushort keep = 4)
+    public static ContextAction BeginSummarise(
+        ushort keepStart = 0,
+        ushort keepEnd = 4,
+        bool preserveSystemStart = true,
+        MessageRole deleteRoles = MessageRole.Reasoning | MessageRole.Tool)
     {
-        return new BeginSummarise(keep);
+        return new BeginSummarise(keepStart, keepEnd, preserveSystemStart, deleteRoles);
     }
 
     /// <summary>
@@ -93,5 +100,5 @@ public abstract record ContextAction
     /// Execute this action on the LLM context
     /// </summary>
     /// <returns>True, if any changes were made</returns>
-    public abstract bool Execute(CleanupContext context);
+    public abstract Task<bool> Execute(CleanupContext context);
 }

@@ -20,13 +20,13 @@ public sealed class ConditionalRepeatTests
     // -------------------------------------------------------------------------
 
     [TestMethod]
-    public void Execute_RunsInnerActionMaxRepeatsTimes()
+    public async Task Execute_RunsInnerActionMaxRepeatsTimes()
     {
         // Tests ContextAction.Repeat factory and ConditionalRepeat.Execute with an explicit repeat count
         const int maxRepeats = 3;
         var ctx = Context(Condition.True(), messageCount: 10);
 
-        var changed = ContextAction.Repeat(ContextAction.RemoveOldest(MessageRole.User), maxRepeats).Execute(ctx);
+        var changed = await ContextAction.Repeat(ContextAction.RemoveOldest(MessageRole.User), maxRepeats).Execute(ctx);
 
         Assert.IsTrue(changed);
         Assert.HasCount(10 - maxRepeats, ctx.Messages);
@@ -34,13 +34,13 @@ public sealed class ConditionalRepeatTests
 
 
     [TestMethod]
-    public void Execute_StopsEarlyWhenConditionBecomesFalse()
+    public async Task Execute_StopsEarlyWhenConditionBecomesFalse()
     {
         // Condition.Changed() returns true on the first call (stateId != Guid.Empty) then false on the second
         var stateId = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
         var ctx = Context(Condition.Changed(), messageCount: 5, stateId: stateId);
 
-        var changed = ContextAction.Repeat(ContextAction.RemoveOldest(MessageRole.User), maxRepeats: 10).Execute(ctx);
+        var changed = await ContextAction.Repeat(ContextAction.RemoveOldest(MessageRole.User), maxRepeats: 10).Execute(ctx);
 
         // Condition was true only on the first iteration, so exactly one message is removed
         Assert.IsTrue(changed);
@@ -48,17 +48,17 @@ public sealed class ConditionalRepeatTests
     }
 
     [TestMethod]
-    public void Execute_NeverRunsInnerAction_WhenConditionFalseOrMaxRepeatsIsZero()
+    public async Task Execute_NeverRunsInnerAction_WhenConditionFalseOrMaxRepeatsIsZero()
     {
         // Always-false condition
         var ctx1 = Context(Condition.False(), messageCount: 5);
-        var changed1 = ContextAction.Repeat(ContextAction.RemoveOldest(MessageRole.User), maxRepeats: 10).Execute(ctx1);
+        var changed1 = await ContextAction.Repeat(ContextAction.RemoveOldest(MessageRole.User), maxRepeats: 10).Execute(ctx1);
         Assert.IsFalse(changed1);
         Assert.HasCount(5, ctx1.Messages);
 
         // Zero max repeats — loop body is never entered even when condition is always true
         var ctx2 = Context(Condition.True(), messageCount: 5);
-        var changed2 = ContextAction.Repeat(ContextAction.RemoveOldest(MessageRole.User), maxRepeats: 0).Execute(ctx2);
+        var changed2 = await ContextAction.Repeat(ContextAction.RemoveOldest(MessageRole.User), maxRepeats: 0).Execute(ctx2);
         Assert.IsFalse(changed2);
         Assert.HasCount(5, ctx2.Messages);
     }

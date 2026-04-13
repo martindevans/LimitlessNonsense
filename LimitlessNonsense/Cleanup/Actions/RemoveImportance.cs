@@ -10,7 +10,7 @@ namespace LimitlessNonsense.Cleanup.Actions;
 internal record RemoveImportance(Importance Threshold, ushort Depth = 0)
     : ContextAction
 {
-    public override bool Execute(CleanupContext context)
+    public override async Task<bool> Execute(CleanupContext context)
     {
         var changed = false;
         

@@ -17,14 +17,14 @@ public sealed class RemoveOldestTests
     // -------------------------------------------------------------------------
 
     [TestMethod]
-    public void Execute_RemovesOldestMatchingMessage()
+    public async Task Execute_RemovesOldestMatchingMessage()
     {
         var system = Message(MessageRole.System);
         var user = Message(MessageRole.User);
         var assistant = Message(MessageRole.Assistant);
         var ctx = Context(system, user, assistant);
 
-        var changed = ContextAction.RemoveOldest(MessageRole.User).Execute(ctx);
+        var changed = await ContextAction.RemoveOldest(MessageRole.User).Execute(ctx);
 
         Assert.IsTrue(changed);
         Assert.HasCount(2, ctx.Messages);
@@ -34,14 +34,14 @@ public sealed class RemoveOldestTests
     }
 
     [TestMethod]
-    public void Execute_MultipleMatchingMessages_OnlyRemovesOldest()
+    public async Task Execute_MultipleMatchingMessages_OnlyRemovesOldest()
     {
         var user1 = Message(MessageRole.User);
         var assistant = Message(MessageRole.Assistant);
         var user2 = Message(MessageRole.User);
         var ctx = Context(user1, assistant, user2);
 
-        var changed = ContextAction.RemoveOldest(MessageRole.User).Execute(ctx);
+        var changed = await ContextAction.RemoveOldest(MessageRole.User).Execute(ctx);
 
         Assert.IsTrue(changed);
         Assert.HasCount(2, ctx.Messages);
@@ -51,14 +51,14 @@ public sealed class RemoveOldestTests
     }
 
     [TestMethod]
-    public void Execute_CombinedRoles_RemovesOldestMatchingAnyRole()
+    public async Task Execute_CombinedRoles_RemovesOldestMatchingAnyRole()
     {
         var system = Message(MessageRole.System);
         var user = Message(MessageRole.User);
         var assistant = Message(MessageRole.Assistant);
         var ctx = Context(system, user, assistant);
 
-        var changed = ContextAction.RemoveOldest(MessageRole.User | MessageRole.Assistant).Execute(ctx);
+        var changed = await ContextAction.RemoveOldest(MessageRole.User | MessageRole.Assistant).Execute(ctx);
 
         Assert.IsTrue(changed);
         Assert.HasCount(2, ctx.Messages);
@@ -72,24 +72,24 @@ public sealed class RemoveOldestTests
     // -------------------------------------------------------------------------
 
     [TestMethod]
-    public void Execute_EmptyContext_DoesNothing()
+    public async Task Execute_EmptyContext_DoesNothing()
     {
         var ctx = Context();
 
-        var changed = ContextAction.RemoveOldest(MessageRole.User).Execute(ctx);
+        var changed = await ContextAction.RemoveOldest(MessageRole.User).Execute(ctx);
 
         Assert.IsFalse(changed);
         Assert.IsEmpty(ctx.Messages);
     }
 
     [TestMethod]
-    public void Execute_NoMatchingRole_DoesNothing()
+    public async Task Execute_NoMatchingRole_DoesNothing()
     {
         var system = Message(MessageRole.System);
         var assistant = Message(MessageRole.Assistant);
         var ctx = Context(system, assistant);
 
-        var changed = ContextAction.RemoveOldest(MessageRole.User).Execute(ctx);
+        var changed = await ContextAction.RemoveOldest(MessageRole.User).Execute(ctx);
 
         Assert.IsFalse(changed);
         Assert.HasCount(2, ctx.Messages);
