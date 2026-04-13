@@ -71,14 +71,18 @@ public abstract record ContextAction
     /// <summary>
     /// Summarise the entire conversation, except for some messages at the end.
     /// </summary>
-    /// <param name="roles"></param>
+    /// <param name="deleteRoles"></param>
     /// <param name="preserveSystemStart"></param>
     /// <param name="keepStart"></param>
     /// <param name="keepEnd"></param>
     /// <returns></returns>
-    public static ContextAction BeginSummarise(ushort keepStart = 0, ushort keepEnd = 4, bool preserveSystemStart = true, MessageRole roles = MessageRole.Assistant | MessageRole.User | MessageRole.Summary)
+    public static ContextAction BeginSummarise(
+        ushort keepStart = 0,
+        ushort keepEnd = 4,
+        bool preserveSystemStart = true,
+        MessageRole deleteRoles = MessageRole.Reasoning | MessageRole.Tool)
     {
-        return new BeginSummarise(keepStart, keepEnd, preserveSystemStart, roles);
+        return new BeginSummarise(keepStart, keepEnd, preserveSystemStart, deleteRoles);
     }
 
     /// <summary>
