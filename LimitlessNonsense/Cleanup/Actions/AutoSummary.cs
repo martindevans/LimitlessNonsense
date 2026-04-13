@@ -77,19 +77,20 @@ internal record EndSummarise(bool Block)
         if (!summaryTask.Task.IsCompleted && !Block)
             return false;
         
-        // Clear the slot, we're about to consume this task
-        context.ActiveSummarisationTask = null;
-
         // Wait for completion
         string summary;
         try
         {
             summary = await summaryTask.Task;
-            await summaryTask.DisposeAsync();
         }
         catch (TaskCanceledException)
         {
             return false;
+        }
+        finally
+        {
+            await summaryTask.DisposeAsync();
+            context.ActiveSummarisationTask = null;
         }
 
         // Check if the original messages still exist
