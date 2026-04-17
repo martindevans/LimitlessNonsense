@@ -8,7 +8,7 @@ namespace LimitlessNonsense.Cleanup.Actions;
 ///
 /// If there's a final result remove all updates, otherwise remove all but the final update
 /// </summary>
-public record RemoveIntermediateLinkedToolUpdates
+internal record RemoveIntermediateLinkedToolUpdates
     : ContextAction
 {
     public override async Task<bool> Execute(CleanupContext context)
