@@ -1,4 +1,6 @@
-﻿namespace LimitlessNonsense.Cleanup.Actions;
+﻿using LimitlessNonsense.Services;
+
+namespace LimitlessNonsense.Cleanup.Actions;
 
 /// <summary>
 /// Begin automatically summarising the context, keeping some of the most recent messages at the end.
