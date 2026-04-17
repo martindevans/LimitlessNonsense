@@ -1,4 +1,4 @@
-﻿namespace LimitlessNonsense;
+﻿namespace LimitlessNonsense.Services;
 
 /// <summary>
 /// Provides summarisation of a block of text

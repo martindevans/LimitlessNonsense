@@ -7,10 +7,10 @@ namespace LimitlessNonsense.Tests;
 [TestClass]
 public sealed class RemoveImportanceTests
 {
-    private static ContextMessage Msg(Importance importance)
-        => new ContextMessage(MessageRole.User) { Importance = importance };
+    private static Message Msg(MessageImportance importance)
+        => new Message(MessageRole.User) { Importance = importance };
 
-    private static CleanupContext Context(params ContextMessage[] messages)
+    private static CleanupContext Context(params Message[] messages)
         => new(Condition.True(), new ContextState(Guid.NewGuid(), 0, 100), messages.ToList());
 
     // -------------------------------------------------------------------------
@@ -21,13 +21,13 @@ public sealed class RemoveImportanceTests
     public async Task Execute_RemovesMessagesAtOrBelowThreshold()
     {
         // Also exercises ContextAction.ImportanceRemoval factory method
-        var veryHigh = Msg(Importance.VeryHigh);
-        var high     = Msg(Importance.High);
-        var normal   = Msg(Importance.Normal);
-        var low      = Msg(Importance.Low);
-        var veryLow  = Msg(Importance.VeryLow);
+        var veryHigh = Msg(MessageImportance.VeryHigh);
+        var high     = Msg(MessageImportance.High);
+        var normal   = Msg(MessageImportance.Normal);
+        var low      = Msg(MessageImportance.Low);
+        var veryLow  = Msg(MessageImportance.VeryLow);
 
-        var action = ContextAction.ImportanceRemoval(Importance.Normal);
+        var action = ContextAction.ImportanceRemoval(MessageImportance.Normal);
         var ctx = Context(veryHigh, high, normal, low, veryLow);
         var changed = await action.Execute(ctx);
 
@@ -45,11 +45,11 @@ public sealed class RemoveImportanceTests
     [TestMethod]
     public async Task Execute_Depth_ProtectsRecentMessages()
     {
-        var old     = Msg(Importance.VeryLow); // index 0 — buried, should be removed
-        var recent1 = Msg(Importance.VeryLow); // index 1 — within depth, protected
-        var recent2 = Msg(Importance.VeryLow); // index 2 — within depth, protected
+        var old     = Msg(MessageImportance.VeryLow); // index 0 — buried, should be removed
+        var recent1 = Msg(MessageImportance.VeryLow); // index 1 — within depth, protected
+        var recent2 = Msg(MessageImportance.VeryLow); // index 2 — within depth, protected
 
-        var action = ContextAction.ImportanceRemoval(Importance.Normal, depth: 2);
+        var action = ContextAction.ImportanceRemoval(MessageImportance.Normal, depth: 2);
         var ctx = Context(old, recent1, recent2);
         var changed = await action.Execute(ctx);
 
@@ -66,7 +66,7 @@ public sealed class RemoveImportanceTests
     [TestMethod]
     public async Task Execute_EmptyMessages_DoesNotThrow()
     {
-        var action = ContextAction.ImportanceRemoval(Importance.Normal);
+        var action = ContextAction.ImportanceRemoval(MessageImportance.Normal);
         var ctx = Context();
 
         var changed = await action.Execute(ctx);
@@ -78,10 +78,10 @@ public sealed class RemoveImportanceTests
     [TestMethod]
     public async Task Execute_DepthExceedsCount_RemovesNothing()
     {
-        var msg1 = Msg(Importance.VeryLow);
-        var msg2 = Msg(Importance.VeryLow);
+        var msg1 = Msg(MessageImportance.VeryLow);
+        var msg2 = Msg(MessageImportance.VeryLow);
 
-        var action = ContextAction.ImportanceRemoval(Importance.Normal, depth: 5);
+        var action = ContextAction.ImportanceRemoval(MessageImportance.Normal, depth: 5);
         var ctx = Context(msg1, msg2);
         var changed = await action.Execute(ctx);
 
@@ -96,7 +96,7 @@ public sealed class RemoveImportanceTests
     [TestMethod]
     public void ImportanceRemoval_RoundTrips_ThroughJson()
     {
-        var action = ContextAction.ImportanceRemoval(Importance.Low, depth: 3);
+        var action = ContextAction.ImportanceRemoval(MessageImportance.Low, depth: 3);
 
         var json = JsonSerializer.Serialize(action);
         var deserialized = JsonSerializer.Deserialize<ContextAction>(json);

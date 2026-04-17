@@ -7,14 +7,14 @@ namespace LimitlessNonsense.Tests;
 [TestClass]
 public sealed class AddMessageSenderPrefixTests
 {
-    private static ContextMessage MsgWithSender(string senderName)
+    private static Message MsgWithSender(string senderName)
     {
-        var msg = new ContextMessage(MessageRole.User);
+        var msg = new Message(MessageRole.User);
         msg.SetMetadata(new MessageSender(senderName));
         return msg;
     }
 
-    private static MiddlewareContext Context(ContextMessage message)
+    private static MiddlewareContext Context(Message message)
         => new([], DateTime.UtcNow, message);
 
     private static Task NoOp(MiddlewareContext _) => Task.CompletedTask;
@@ -26,7 +26,7 @@ public sealed class AddMessageSenderPrefixTests
     [TestMethod]
     public async Task Process_NoSenderMetadata_PrefixUnchanged()
     {
-        var msg = new ContextMessage(MessageRole.User);
+        var msg = new Message(MessageRole.User);
         var middleware = new AddMessageSenderPrefix();
         var context = Context(msg);
 
@@ -140,7 +140,7 @@ public sealed class AddMessageSenderPrefixTests
     [TestMethod]
     public async Task Process_WithoutSender_StillCallsNext()
     {
-        var msg = new ContextMessage(MessageRole.User);
+        var msg = new Message(MessageRole.User);
         var middleware = new AddMessageSenderPrefix();
         var context = Context(msg);
         var called = false;

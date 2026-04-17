@@ -2,7 +2,7 @@
 
 public sealed class MiddlewareContext
 {
-    public MiddlewareContext(List<ContextMessage> history, DateTime now, ContextMessage message)
+    public MiddlewareContext(List<Message> history, DateTime now, Message message)
     {
         History = history;
         UtcNow = now;
@@ -17,10 +17,10 @@ public sealed class MiddlewareContext
     /// <summary>
     /// History of all messages
     /// </summary>
-    public List<ContextMessage> History { get; }
+    public List<Message> History { get; }
 
     /// <summary>
     /// The new message that is about to be added
     /// </summary>
-    public ContextMessage Message { get; }
+    public Message Message { get; }
 }

@@ -7,7 +7,7 @@ namespace LimitlessNonsense.Cleanup.Actions;
 /// </summary>
 /// <param name="Threshold"></param>
 /// <param name="Depth"></param>
-internal record RemoveImportance(Importance Threshold, ushort Depth = 0)
+internal record RemoveImportance(MessageImportance Threshold, ushort Depth = 0)
     : ContextAction
 {
     public override async Task<bool> Execute(CleanupContext context)

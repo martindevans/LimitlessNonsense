@@ -6,11 +6,11 @@ namespace LimitlessNonsense.Tests;
 [TestClass]
 public sealed class RemoveOldestTests
 {
-    private static CleanupContext Context(params ContextMessage[] messages)
+    private static CleanupContext Context(params Message[] messages)
         => new(Condition.True(), new ContextState(Guid.NewGuid(), 50, 100), messages.ToList());
 
-    private static ContextMessage Message(MessageRole role)
-        => new ContextMessage(role);
+    private static Message Message(MessageRole role)
+        => new Message(role);
 
     // -------------------------------------------------------------------------
     // Basic Behavior

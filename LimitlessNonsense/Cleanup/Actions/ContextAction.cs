@@ -13,6 +13,7 @@ namespace LimitlessNonsense.Cleanup.Actions;
 [JsonDerivedType(typeof(RemoveRole), nameof(Actions.RemoveRole))]
 [JsonDerivedType(typeof(BeginSummarise), nameof(Actions.BeginSummarise))]
 [JsonDerivedType(typeof(EndSummarise), nameof(Actions.EndSummarise))]
+[JsonDerivedType(typeof(RemoveIntermediateLinkedToolUpdates), nameof(RemoveIntermediateLinkedToolUpdates))]
 public abstract record ContextAction
 {
     #region static factories
@@ -42,7 +43,7 @@ public abstract record ContextAction
     /// </summary>
     /// <param name="threshold"></param>
     /// <param name="depth"></param>
-    public static ContextAction ImportanceRemoval(Importance threshold, ushort depth = 0)
+    public static ContextAction ImportanceRemoval(MessageImportance threshold, ushort depth = 0)
     {
         return new RemoveImportance(threshold, depth);
     }
@@ -93,6 +94,16 @@ public abstract record ContextAction
     public static ContextAction EndSummarise(bool block)
     {
         return new EndSummarise(block);
+    }
+
+    /// <summary>
+    /// Remove intermediate update messages for linked tool calls. If a final result exists all updates are removed;
+    /// otherwise all updates except the most recent are removed.
+    /// </summary>
+    /// <returns>A <see cref="ContextAction"/> that removes intermediate linked tool update messages.</returns>
+    public static ContextAction RemoveIntermediateLinkedToolUpdates()
+    {
+        return new RemoveIntermediateLinkedToolUpdates();
     }
     #endregion
 

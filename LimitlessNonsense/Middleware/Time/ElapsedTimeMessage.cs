@@ -31,9 +31,9 @@ public class ElapsedTimeMessage
                 if (elapsed > _duration)
                 {
                     // Add new time message
-                    var msg = new ContextMessage(
+                    var msg = new Message(
                         MessageRole.Tool,
-                        Importance.Ephemeral,
+                        MessageImportance.Ephemeral,
                         content: $"{elapsed.Humanize(culture: CultureInfo.InvariantCulture)} since last message"
                     );
                     context.History.Add(msg);

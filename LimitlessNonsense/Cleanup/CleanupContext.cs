@@ -14,7 +14,7 @@ public record CleanupContext
     public ContextState State { get; init; }
 
     /// <summary>List of messages in the context</summary>
-    public List<ContextMessage> Messages { get; private set; }
+    public List<Message> Messages { get; private set; }
 
     /// <summary>Service provider</summary>
     public IServiceProvider? Services { get; init; }
@@ -29,7 +29,7 @@ public record CleanupContext
     /// <param name="state">State of the context</param>
     /// <param name="messages">List of messages in the context</param>
     /// <param name="services"></param>
-    public CleanupContext(Condition condition, ContextState state, List<ContextMessage> messages, IServiceProvider? services = null)
+    public CleanupContext(Condition condition, ContextState state, List<Message> messages, IServiceProvider? services = null)
     {
         Condition = condition;
         State = state;

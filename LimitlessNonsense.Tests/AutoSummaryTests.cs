@@ -1,6 +1,7 @@
 using System.Text.Json;
 using LimitlessNonsense.Cleanup;
 using LimitlessNonsense.Cleanup.Actions;
+using LimitlessNonsense.Services;
 
 namespace LimitlessNonsense.Tests;
 
@@ -13,11 +14,11 @@ public sealed class AutoSummaryTests
 
     private static CleanupContext Context(
         IServiceProvider? services,
-        params ContextMessage[] messages)
+        params Message[] messages)
         => new(Condition.True(), new ContextState(Guid.NewGuid(), 50, 100), messages.ToList(), services);
 
-    private static ContextMessage Msg(MessageRole role, string content = "")
-        => new ContextMessage(role, content: content);
+    private static Message Msg(MessageRole role, string content = "")
+        => new Message(role, content: content);
 
     /// <summary>Minimal IServiceProvider that exposes a single ISummarisationProvider.</summary>
     private sealed class FakeServices(ISummarisationProvider provider) : IServiceProvider

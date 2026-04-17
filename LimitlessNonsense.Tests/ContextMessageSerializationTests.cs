@@ -12,14 +12,14 @@ public sealed class ContextMessageSerializationTests
     public void RoundTrip_NoMetadata()
     {
         var id = Guid.NewGuid();
-        var original = new ContextMessage(MessageRole.User, Importance.High, "Hello world", id)
+        var original = new Message(MessageRole.User, MessageImportance.High, "Hello world", id)
         {
             Prefix = "PRE",
             Suffix = "SUF",
         };
 
         var json = JsonSerializer.Serialize(original, Options);
-        var deserialized = JsonSerializer.Deserialize<ContextMessage>(json, Options);
+        var deserialized = JsonSerializer.Deserialize<Message>(json, Options);
 
         Assert.IsNotNull(deserialized);
         Assert.AreEqual(original.ID, deserialized.ID);
@@ -33,10 +33,10 @@ public sealed class ContextMessageSerializationTests
     [TestMethod]
     public void RoundTrip_FlagsRole()
     {
-        var original = new ContextMessage(MessageRole.System | MessageRole.Summary);
+        var original = new Message(MessageRole.System | MessageRole.Summary);
 
         var json = JsonSerializer.Serialize(original, Options);
-        var deserialized = JsonSerializer.Deserialize<ContextMessage>(json, Options);
+        var deserialized = JsonSerializer.Deserialize<Message>(json, Options);
 
         Assert.IsNotNull(deserialized);
         Assert.AreEqual(original.Role, deserialized.Role);
@@ -45,11 +45,11 @@ public sealed class ContextMessageSerializationTests
     [TestMethod]
     public void RoundTrip_SingleMetadata()
     {
-        var original = new ContextMessage(MessageRole.User, Importance.Normal, "Hello", Guid.NewGuid());
+        var original = new Message(MessageRole.User, MessageImportance.Normal, "Hello", Guid.NewGuid());
         original.SetMetadata(new MessageSender("Alice"));
 
         var json = JsonSerializer.Serialize(original, Options);
-        var deserialized = JsonSerializer.Deserialize<ContextMessage>(json, Options);
+        var deserialized = JsonSerializer.Deserialize<Message>(json, Options);
 
         Assert.IsNotNull(deserialized);
         Assert.AreEqual(original.ID, deserialized.ID);
@@ -62,12 +62,12 @@ public sealed class ContextMessageSerializationTests
     [TestMethod]
     public void RoundTrip_MultipleMetadata()
     {
-        var original = new ContextMessage(MessageRole.User, Importance.Normal, "Hello", Guid.NewGuid());
+        var original = new Message(MessageRole.User, MessageImportance.Normal, "Hello", Guid.NewGuid());
         original.SetMetadata(new MessageSender("Bob"));
         original.SetMetadata(new MessageCreationTime(new DateTime(2024, 6, 15, 10, 30, 0, DateTimeKind.Utc)));
 
         var json = JsonSerializer.Serialize(original, Options);
-        var deserialized = JsonSerializer.Deserialize<ContextMessage>(json, Options);
+        var deserialized = JsonSerializer.Deserialize<Message>(json, Options);
 
         Assert.IsNotNull(deserialized);
 
@@ -83,11 +83,11 @@ public sealed class ContextMessageSerializationTests
     [TestMethod]
     public void RoundTrip_AllImportanceLevels()
     {
-        foreach (var importance in Enum.GetValues<Importance>())
+        foreach (var importance in Enum.GetValues<MessageImportance>())
         {
-            var original = new ContextMessage(MessageRole.User, importance);
+            var original = new Message(MessageRole.User, importance);
             var json = JsonSerializer.Serialize(original, Options);
-            var deserialized = JsonSerializer.Deserialize<ContextMessage>(json, Options);
+            var deserialized = JsonSerializer.Deserialize<Message>(json, Options);
 
             Assert.IsNotNull(deserialized);
             Assert.AreEqual(importance, deserialized.Importance);
@@ -115,7 +115,7 @@ public sealed class ContextMessageSerializationTests
             """;
 
         Assert.ThrowsExactly<JsonException>(() =>
-            JsonSerializer.Deserialize<ContextMessage>(maliciousJson, Options));
+            JsonSerializer.Deserialize<Message>(maliciousJson, Options));
     }
 
     [TestMethod]
@@ -139,7 +139,7 @@ public sealed class ContextMessageSerializationTests
             """;
 
         Assert.ThrowsExactly<JsonException>(() =>
-            JsonSerializer.Deserialize<ContextMessage>(json, Options));
+            JsonSerializer.Deserialize<Message>(json, Options));
     }
 
     [TestMethod]
@@ -162,13 +162,13 @@ public sealed class ContextMessageSerializationTests
             """;
 
         Assert.ThrowsExactly<JsonException>(() =>
-            JsonSerializer.Deserialize<ContextMessage>(json, Options));
+            JsonSerializer.Deserialize<Message>(json, Options));
     }
 
     [TestMethod]
     public void Serialize_ContainsTypeTagInMetadata()
     {
-        var original = new ContextMessage(MessageRole.Assistant);
+        var original = new Message(MessageRole.Assistant);
         original.SetMetadata(new MessageSender("Charlie"));
 
         var json = JsonSerializer.Serialize(original, Options);

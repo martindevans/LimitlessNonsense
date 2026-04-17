@@ -11,16 +11,16 @@ public sealed class DateChangedMessageTests
     private static readonly DateTime Day2 = new(2024, 6, 2, 12, 0, 0, DateTimeKind.Utc);
     private static readonly DateTime Day3 = new(2024, 6, 3, 12, 0, 0, DateTimeKind.Utc);
 
-    private static ContextMessage DatedMsg(DateTime time)
+    private static Message DatedMsg(DateTime time)
     {
-        var msg = new ContextMessage(MessageRole.User);
+        var msg = new Message(MessageRole.User);
         msg.SetMetadata(new MessageCreationTime(time));
         return msg;
     }
 
-    private static MiddlewareContext Context(DateTime now, params ContextMessage[] history)
+    private static MiddlewareContext Context(DateTime now, params Message[] history)
     {
-        var newMsg = new ContextMessage(MessageRole.User);
+        var newMsg = new Message(MessageRole.User);
         return new MiddlewareContext([.. history], now, newMsg);
     }
 
@@ -44,7 +44,7 @@ public sealed class DateChangedMessageTests
     [TestMethod]
     public async Task Process_HistoryWithNoDatedMessages_DoesNotAddMessage()
     {
-        var undated = new ContextMessage(MessageRole.User, content: "hello");
+        var undated = new Message(MessageRole.User, content: "hello");
         var middleware = new DateChangedMessage();
         var context = Context(Day2, undated);
 
@@ -93,7 +93,7 @@ public sealed class DateChangedMessageTests
 
         var added = context.History.First(m => m != existing);
         Assert.AreEqual(MessageRole.Tool, added.Role);
-        Assert.AreEqual(Importance.Low, added.Importance);
+        Assert.AreEqual(MessageImportance.Low, added.Importance);
     }
 
     [TestMethod]

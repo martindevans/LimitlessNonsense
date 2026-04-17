@@ -1,4 +1,6 @@
-﻿namespace LimitlessNonsense.Cleanup.Actions;
+﻿using LimitlessNonsense.Services;
+
+namespace LimitlessNonsense.Cleanup.Actions;
 
 /// <summary>
 /// Begin automatically summarising the context, keeping some of the most recent messages at the end.
@@ -111,13 +113,16 @@ internal record EndSummarise(bool Block)
             context.Messages.Remove(msg);
         
         // Insert summary
-        var summaryMessage = new ContextMessage(MessageRole.Summary, content: summary);
+        var summaryMessage = new Message(MessageRole.Summary, content: summary);
         context.Messages.Insert(Math.Min(firstIndex, context.Messages.Count), summaryMessage);
 
         return true;
     }
 }
 
+/// <summary>
+/// An in-flight summarisation task that can be applied to the context later
+/// </summary>
 public class SummarisationTask
     : IAsyncDisposable
 {

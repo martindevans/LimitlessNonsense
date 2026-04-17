@@ -13,7 +13,7 @@ public sealed class CleanupContextTests
 
     
 
-    private static ContextMessage Msg(Guid id, MessageRole role = MessageRole.User, Importance importance = Importance.Normal)
+    private static Message Msg(Guid id, MessageRole role = MessageRole.User, MessageImportance importance = MessageImportance.Normal)
         => new(role, guid: id) { Importance = importance };
 
     // -------------------------------------------------------------------------
@@ -25,7 +25,7 @@ public sealed class CleanupContextTests
     {
         var condition = Condition.True();
         var state = DefaultState();
-        List<ContextMessage> messages = [Msg(GuidA), Msg(GuidB)];
+        List<Message> messages = [Msg(GuidA), Msg(GuidB)];
 
         var ctx = new CleanupContext(condition, state, messages);
 
