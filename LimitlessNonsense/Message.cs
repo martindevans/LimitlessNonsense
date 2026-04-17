@@ -85,6 +85,16 @@ public sealed record Message
     }
 
     /// <summary>
+    /// Set or overwrite the metadata by runtime type (for deserialization, avoids reflection at call site)
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="metadata"></param>
+    internal void SetMetadata(Type type, IMessageMetadata metadata)
+    {
+        _metadata[type] = metadata;
+    }
+
+    /// <summary>
     /// Returns all metadata entries as type/value pairs (for serialization)
     /// </summary>
     internal IEnumerable<KeyValuePair<Type, object?>> GetMetadataEntries() => _metadata;
@@ -180,10 +190,7 @@ internal sealed class MessageJsonConverter
                     ?? throw new JsonException($"Deserialized null value for metadata type '{typeName}'."));
 
                 // Attach the metadata
-                typeof(Message)
-                    .GetMethod(nameof(Message.SetMetadata))!
-                    .MakeGenericMethod(type)
-                    .Invoke(message, [value]);
+                message.SetMetadata(type, value);
             }
         }
 
