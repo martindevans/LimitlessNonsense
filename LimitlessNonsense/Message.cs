@@ -87,8 +87,8 @@ public sealed record Message
     /// <summary>
     /// Set or overwrite the metadata by runtime type (for deserialization, avoids reflection at call site)
     /// </summary>
-    /// <param name="type"></param>
-    /// <param name="metadata"></param>
+    /// <param name="type">The runtime type of the metadata, used as the dictionary key.</param>
+    /// <param name="metadata">The metadata instance to associate with this message.</param>
     internal void SetMetadata(Type type, IMessageMetadata metadata)
     {
         _metadata[type] = metadata;
