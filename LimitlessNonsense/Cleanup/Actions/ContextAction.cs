@@ -97,9 +97,10 @@ public abstract record ContextAction
     }
 
     /// <summary>
-    /// Remove intermediate update messages for linked tool calls, keeping only the first and last (or just the last update if there is no final result).
+    /// Remove intermediate update messages for linked tool calls. If a final result exists all updates are removed;
+    /// otherwise all updates except the most recent are removed.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A <see cref="ContextAction"/> that removes intermediate linked tool update messages.</returns>
     public static ContextAction RemoveIntermediateLinkedToolUpdates()
     {
         return new RemoveIntermediateLinkedToolUpdates();
