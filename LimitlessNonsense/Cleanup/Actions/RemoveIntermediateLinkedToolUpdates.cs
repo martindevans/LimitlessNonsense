@@ -14,7 +14,7 @@ internal record RemoveIntermediateLinkedToolUpdates
     public override async Task<bool> Execute(CleanupContext context)
     {
         var changed = false;
-        var isRemoving = new Dictionary<Guid, bool>();
+        var isRemoving = new HashSet<Guid>();
 
         // Iterate backwards
         for (var i = context.Messages.Count - 1; i >= 0; i--)
@@ -26,16 +26,11 @@ internal record RemoveIntermediateLinkedToolUpdates
             if (link == null)
                 continue;
 
-            // If we don't know state, update it now
-            if (!isRemoving.TryGetValue(link.Id, out var removing))
-            {
-                // We found a message, whatever it is remove earlier updates
-                isRemoving[link.Id] = true;
-            }
-            else
+            // We found a message from this ID, we want to remove all earlier update messages.
+            if (!isRemoving.Add(link.Id))
             {
                 // Remove this message
-                if (removing && link.Type == LinkedToolCallType.Update)
+                if (link.Type == LinkedToolCallType.Update)
                 {
                     context.Messages.RemoveAt(i);
                     changed = true;
