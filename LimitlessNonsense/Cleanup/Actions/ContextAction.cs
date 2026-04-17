@@ -95,6 +95,16 @@ public abstract record ContextAction
     {
         return new EndSummarise(block);
     }
+
+    /// <summary>
+    /// Remove intermediate update messages for linked tool calls. If a final result exists all updates are removed;
+    /// otherwise all updates except the most recent are removed.
+    /// </summary>
+    /// <returns>A <see cref="ContextAction"/> that removes intermediate linked tool update messages.</returns>
+    public static ContextAction RemoveIntermediateLinkedToolUpdates()
+    {
+        return new RemoveIntermediateLinkedToolUpdates();
+    }
     #endregion
 
     /// <summary>
