@@ -10,9 +10,9 @@ public sealed class AddMessageCreationTimeMetadataTests
 {
     private static readonly DateTime Now = new(2024, 6, 1, 13, 46, 0, DateTimeKind.Utc);
 
-    private static MiddlewareContext Context(DateTime now, ContextMessage? message = null)
+    private static MiddlewareContext Context(DateTime now, Message? message = null)
     {
-        message ??= new ContextMessage(MessageRole.User);
+        message ??= new Message(MessageRole.User);
         return new MiddlewareContext([], now, message);
     }
 
@@ -25,7 +25,7 @@ public sealed class AddMessageCreationTimeMetadataTests
     [TestMethod]
     public async Task Process_NoExistingMetadata_AddsCreationTimeMetadata()
     {
-        var message = new ContextMessage(MessageRole.User);
+        var message = new Message(MessageRole.User);
         var context = Context(Now, message);
 
         await new AddMessageCreationTimeMetadata().Process(context, NoOp);
@@ -36,7 +36,7 @@ public sealed class AddMessageCreationTimeMetadataTests
     [TestMethod]
     public async Task Process_NoExistingMetadata_MetadataTimeMatchesContextNow()
     {
-        var message = new ContextMessage(MessageRole.User);
+        var message = new Message(MessageRole.User);
         var context = Context(Now, message);
 
         await new AddMessageCreationTimeMetadata().Process(context, NoOp);
@@ -52,7 +52,7 @@ public sealed class AddMessageCreationTimeMetadataTests
     public async Task Process_ExistingMetadata_OverwriteFalse_DoesNotOverwrite()
     {
         var earlier = Now.AddHours(-1);
-        var message = new ContextMessage(MessageRole.User);
+        var message = new Message(MessageRole.User);
         message.SetMetadata(new MessageCreationTime(earlier));
         var context = Context(Now, message);
 
@@ -65,7 +65,7 @@ public sealed class AddMessageCreationTimeMetadataTests
     public async Task Process_ExistingMetadata_OverwriteTrue_OverwritesMetadata()
     {
         var earlier = Now.AddHours(-1);
-        var message = new ContextMessage(MessageRole.User);
+        var message = new Message(MessageRole.User);
         message.SetMetadata(new MessageCreationTime(earlier));
         var context = Context(Now, message);
 
@@ -92,7 +92,7 @@ public sealed class AddMessageCreationTimeMetadataTests
     [TestMethod]
     public async Task Process_ExistingMetadata_OverwriteFalse_CallsNext()
     {
-        var message = new ContextMessage(MessageRole.User);
+        var message = new Message(MessageRole.User);
         message.SetMetadata(new MessageCreationTime(Now));
         var context = Context(Now, message);
         var called = false;
@@ -108,12 +108,12 @@ public sealed class AddMessageTimePrefixTests
 {
     private static readonly DateTime Now = new(2024, 6, 1, 13, 46, 0, DateTimeKind.Utc);
 
-    private static MiddlewareContext ContextWithMessage(ContextMessage message)
+    private static MiddlewareContext ContextWithMessage(Message message)
         => new([], Now, message);
 
-    private static ContextMessage MessageWithCreationTime(DateTime time, string prefix = "")
+    private static Message MessageWithCreationTime(DateTime time, string prefix = "")
     {
-        var msg = new ContextMessage(MessageRole.User);
+        var msg = new Message(MessageRole.User);
         msg.SetMetadata(new MessageCreationTime(time));
         msg.Prefix = prefix;
         return msg;
@@ -128,7 +128,7 @@ public sealed class AddMessageTimePrefixTests
     [TestMethod]
     public async Task Process_NoCreationTimeMetadata_DoesNotModifyPrefix()
     {
-        var message = new ContextMessage(MessageRole.User);
+        var message = new Message(MessageRole.User);
         var context = ContextWithMessage(message);
 
         await new AddMessageCreationTimePrefix().Process(context, NoOp);
@@ -139,7 +139,7 @@ public sealed class AddMessageTimePrefixTests
     [TestMethod]
     public async Task Process_NoCreationTimeMetadata_CallsNext()
     {
-        var message = new ContextMessage(MessageRole.User);
+        var message = new Message(MessageRole.User);
         var context = ContextWithMessage(message);
         var called = false;
 

@@ -27,7 +27,7 @@ public sealed class ConditionalSequenceTests
         }
     }
 
-    private static CleanupContext CreateContext(params ContextMessage[] messages)
+    private static CleanupContext CreateContext(params Message[] messages)
     {
         return new CleanupContext(
             Condition.True(),
@@ -70,8 +70,8 @@ public sealed class ConditionalSequenceTests
     [TestMethod]
     public async Task Execute_ContextModificationsPropagate_BetweenActions()
     {
-        var msg1 = new ContextMessage(MessageRole.User);
-        var msg2 = new ContextMessage(MessageRole.User);
+        var msg1 = new Message(MessageRole.User);
+        var msg2 = new Message(MessageRole.User);
         var ctx = CreateContext(msg1, msg2);
 
         // Two sequential removals: the second should see the result of the first

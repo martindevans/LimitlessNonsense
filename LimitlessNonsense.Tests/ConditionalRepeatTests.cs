@@ -10,7 +10,7 @@ public sealed class ConditionalRepeatTests
     {
         var state = new ContextState(stateId ?? Guid.NewGuid(), 50, 100);
         var messages = Enumerable.Range(0, messageCount)
-            .Select(_ => new ContextMessage(MessageRole.User))
+            .Select(_ => new Message(MessageRole.User))
             .ToList();
         return new CleanupContext(condition, state, messages);
     }

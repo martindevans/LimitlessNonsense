@@ -111,13 +111,16 @@ internal record EndSummarise(bool Block)
             context.Messages.Remove(msg);
         
         // Insert summary
-        var summaryMessage = new ContextMessage(MessageRole.Summary, content: summary);
+        var summaryMessage = new Message(MessageRole.Summary, content: summary);
         context.Messages.Insert(Math.Min(firstIndex, context.Messages.Count), summaryMessage);
 
         return true;
     }
 }
 
+/// <summary>
+/// An in-flight summarisation task that can be applied to the context later
+/// </summary>
 public class SummarisationTask
     : IAsyncDisposable
 {
@@ -147,4 +150,18 @@ public class SummarisationTask
     {
         Cancellation.Dispose();
     }
+}
+
+/// <summary>
+/// Provides summarisation of a block of text
+/// </summary>
+public interface ISummarisationProvider
+{
+    /// <summary>
+    /// Given a block of input text, summarise/compress it.
+    /// </summary>
+    /// <param name="input"></param>
+    /// <param name="cancellation"></param>
+    /// <returns></returns>
+    Task<string> Summarise(string input, CancellationToken cancellation = default);
 }

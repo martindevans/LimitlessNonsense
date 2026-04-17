@@ -24,7 +24,7 @@ var policies = new CleanupPolicy[]
         Always(),
         True(),
         Sequence([
-            ImportanceRemoval(Importance.VeryLow, depth: 8),
+            ImportanceRemoval(MessageImportance.VeryLow, depth: 8),
             RemoveRole(MessageRole.Reasoning, depth: 8),
             RemoveRole(MessageRole.Tool, depth: 8)
         ])
@@ -58,15 +58,15 @@ var policies = new CleanupPolicy[]
             EndSummarise(block:true),
             RemoveRole(MessageRole.Reasoning, depth: 2),
             RemoveRole(MessageRole.Tool, depth: 4),
-            ImportanceRemoval(Importance.VeryLow, depth: 2),
-            ImportanceRemoval(Importance.Low, depth: 4),
-            ImportanceRemoval(Importance.Normal, depth: 6),
+            ImportanceRemoval(MessageImportance.VeryLow, depth: 2),
+            ImportanceRemoval(MessageImportance.Low, depth: 4),
+            ImportanceRemoval(MessageImportance.Normal, depth: 6),
             RemoveRole(MessageRole.Reasoning | MessageRole.Tool, depth: 0),
             BeginSummarise(keepEnd:2),
             EndSummarise(block:true),
-            ImportanceRemoval(Importance.VeryLow, depth: 0),
-            ImportanceRemoval(Importance.Low, depth: 0),
-            ImportanceRemoval(Importance.Normal, depth: 0),
+            ImportanceRemoval(MessageImportance.VeryLow, depth: 0),
+            ImportanceRemoval(MessageImportance.Low, depth: 0),
+            ImportanceRemoval(MessageImportance.Normal, depth: 0),
             Repeat(
                 RemoveOldest(~MessageRole.System)
             ),
@@ -95,7 +95,7 @@ var pipeline = new Pipeline([
 
 
 
-var sys = new ContextMessage(MessageRole.System, Importance.VeryHigh, "System Prompt", Guid.NewGuid());
+var sys = new Message(MessageRole.System, MessageImportance.VeryHigh, "System Prompt", Guid.NewGuid());
 sys.SetMetadata(new MessageCreationTime(DateTime.UtcNow - TimeSpan.FromMinutes(30)));
 
 var ctx = new MiddlewareContext(
@@ -103,7 +103,7 @@ var ctx = new MiddlewareContext(
         sys
     ],
     DateTime.UtcNow,
-    new ContextMessage(MessageRole.User, Importance.Normal, "Hi")
+    new Message(MessageRole.User, MessageImportance.Normal, "Hi")
 );
 
 pipeline.Apply(ctx);

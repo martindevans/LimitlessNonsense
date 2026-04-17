@@ -29,9 +29,9 @@ public class DateChangedMessage
         if (previous.HasValue && dateNow != previous.Value)
         {
             // Add a new message with the date changed text
-            var msg = new ContextMessage(
+            var msg = new Message(
                 MessageRole.Tool,
-                Importance.Low,
+                MessageImportance.Low,
                 $"{_prefix}{context.UtcNow.Date.ToString(_format, CultureInfo.InvariantCulture)}{_suffix}"
             );
             context.History.Add(msg);

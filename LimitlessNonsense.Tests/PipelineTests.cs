@@ -6,7 +6,7 @@ namespace LimitlessNonsense.Tests;
 public sealed class PipelineTests
 {
     private static MiddlewareContext Context()
-        => new([], DateTime.UtcNow, new ContextMessage(MessageRole.User));
+        => new([], DateTime.UtcNow, new Message(MessageRole.User));
 
     // Empty pipeline
     [TestMethod]

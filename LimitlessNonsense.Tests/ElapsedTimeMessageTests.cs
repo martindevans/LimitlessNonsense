@@ -10,12 +10,12 @@ public sealed class ElapsedTimeMessageTests
     private static readonly TimeSpan Threshold = TimeSpan.FromHours(1);
     private static readonly DateTime BaseTime = new(2024, 1, 1, 12, 0, 0, DateTimeKind.Utc);
 
-    private static MiddlewareContext Context(DateTime now, params ContextMessage[] history)
-        => new(new List<ContextMessage>(history), now, new ContextMessage(MessageRole.User));
+    private static MiddlewareContext Context(DateTime now, params Message[] history)
+        => new(new List<Message>(history), now, new Message(MessageRole.User));
 
-    private static ContextMessage MessageWithTime(DateTime time, MessageRole role = MessageRole.User)
+    private static Message MessageWithTime(DateTime time, MessageRole role = MessageRole.User)
     {
-        var msg = new ContextMessage(role);
+        var msg = new Message(role);
         msg.SetMetadata(new MessageCreationTime(time));
         return msg;
     }
@@ -71,7 +71,7 @@ public sealed class ElapsedTimeMessageTests
 
         await new ElapsedTimeMessage(Threshold).Process(ctx, NoOp);
 
-        Assert.AreEqual(Importance.Ephemeral, ctx.History[^1].Importance);
+        Assert.AreEqual(MessageImportance.Ephemeral, ctx.History[^1].Importance);
     }
 
     [TestMethod]
@@ -146,7 +146,7 @@ public sealed class ElapsedTimeMessageTests
     [TestMethod]
     public async Task Process_LastMessageHasNoCreationTimeMetadata_DoesNotAddMessage()
     {
-        var msgWithoutTime = new ContextMessage(MessageRole.User);
+        var msgWithoutTime = new Message(MessageRole.User);
         var ctx = Context(BaseTime + TimeSpan.FromHours(2), msgWithoutTime);
 
         await new ElapsedTimeMessage(Threshold).Process(ctx, NoOp);

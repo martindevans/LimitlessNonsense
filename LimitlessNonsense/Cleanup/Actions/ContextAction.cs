@@ -13,6 +13,7 @@ namespace LimitlessNonsense.Cleanup.Actions;
 [JsonDerivedType(typeof(RemoveRole), nameof(Actions.RemoveRole))]
 [JsonDerivedType(typeof(BeginSummarise), nameof(Actions.BeginSummarise))]
 [JsonDerivedType(typeof(EndSummarise), nameof(Actions.EndSummarise))]
+[JsonDerivedType(typeof(RemoveIntermediateLinkedToolUpdates), nameof(RemoveIntermediateLinkedToolUpdates))]
 public abstract record ContextAction
 {
     #region static factories
@@ -42,7 +43,7 @@ public abstract record ContextAction
     /// </summary>
     /// <param name="threshold"></param>
     /// <param name="depth"></param>
-    public static ContextAction ImportanceRemoval(Importance threshold, ushort depth = 0)
+    public static ContextAction ImportanceRemoval(MessageImportance threshold, ushort depth = 0)
     {
         return new RemoveImportance(threshold, depth);
     }
