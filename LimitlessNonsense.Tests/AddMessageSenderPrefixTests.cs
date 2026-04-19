@@ -149,4 +149,57 @@ public sealed class AddMessageSenderPrefixTests
 
         Assert.IsTrue(called);
     }
+
+    // -------------------------------------------------------------------------
+    // Excluded roles
+    // -------------------------------------------------------------------------
+
+    [TestMethod]
+    public async Task Process_ExcludedRole_PrefixUnchanged()
+    {
+        var msg = MsgWithSender("Martin");
+        var middleware = new AddMessageSenderPrefix(exclude: MessageRole.User);
+        var context = Context(msg);
+
+        await middleware.Process(context, NoOp);
+
+        Assert.AreEqual("", context.Message.Prefix);
+    }
+
+    [TestMethod]
+    public async Task Process_ExcludedRole_StillCallsNext()
+    {
+        var msg = MsgWithSender("Martin");
+        var middleware = new AddMessageSenderPrefix(exclude: MessageRole.User);
+        var context = Context(msg);
+        var called = false;
+
+        await middleware.Process(context, ctx => { called = true; return Task.CompletedTask; });
+
+        Assert.IsTrue(called);
+    }
+
+    [TestMethod]
+    public async Task Process_NonExcludedRole_PrefixApplied()
+    {
+        var msg = MsgWithSender("Martin");
+        var middleware = new AddMessageSenderPrefix(exclude: MessageRole.Assistant);
+        var context = Context(msg);
+
+        await middleware.Process(context, NoOp);
+
+        Assert.AreEqual("[Martin]", context.Message.Prefix);
+    }
+
+    [TestMethod]
+    public async Task Process_ExcludedRoleFlags_MatchingRoleExcluded()
+    {
+        var msg = MsgWithSender("Martin");
+        var middleware = new AddMessageSenderPrefix(exclude: MessageRole.User | MessageRole.Assistant);
+        var context = Context(msg);
+
+        await middleware.Process(context, NoOp);
+
+        Assert.AreEqual("", context.Message.Prefix);
+    }
 }
