@@ -16,7 +16,10 @@ var policies = new CleanupPolicy[]
     new(
         Always(),
         True(),
-        EndSummarise(block:false)
+        Sequence([
+            EndSummarise(block:false),
+            RemoveIntermediateLinkedToolUpdates()
+        ])
     ),
     
     // After every message do some cleanup

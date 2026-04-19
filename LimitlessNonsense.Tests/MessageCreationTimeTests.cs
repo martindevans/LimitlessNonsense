@@ -238,4 +238,53 @@ public sealed class AddMessageTimePrefixTests
 
         Assert.IsTrue(called);
     }
+
+    // -------------------------------------------------------------------------
+    // Excluded roles
+    // -------------------------------------------------------------------------
+
+    [TestMethod]
+    public async Task Process_ExcludedRole_PrefixUnchanged()
+    {
+        var message = MessageWithCreationTime(Now);
+        var context = ContextWithMessage(message);
+
+        await new AddMessageCreationTimePrefix(exclude: MessageRole.User).Process(context, NoOp);
+
+        Assert.AreEqual("", message.Prefix);
+    }
+
+    [TestMethod]
+    public async Task Process_ExcludedRole_StillCallsNext()
+    {
+        var message = MessageWithCreationTime(Now);
+        var context = ContextWithMessage(message);
+        var called = false;
+
+        await new AddMessageCreationTimePrefix(exclude: MessageRole.User).Process(context, _ => { called = true; return Task.CompletedTask; });
+
+        Assert.IsTrue(called);
+    }
+
+    [TestMethod]
+    public async Task Process_NonExcludedRole_PrefixApplied()
+    {
+        var message = MessageWithCreationTime(Now);
+        var context = ContextWithMessage(message);
+
+        await new AddMessageCreationTimePrefix(exclude: MessageRole.Assistant).Process(context, NoOp);
+
+        Assert.AreEqual("[13:46]", message.Prefix);
+    }
+
+    [TestMethod]
+    public async Task Process_ExcludedRoleFlags_MatchingRoleExcluded()
+    {
+        var message = MessageWithCreationTime(Now);
+        var context = ContextWithMessage(message);
+
+        await new AddMessageCreationTimePrefix(exclude: MessageRole.User | MessageRole.Assistant).Process(context, NoOp);
+
+        Assert.AreEqual("", message.Prefix);
+    }
 }
