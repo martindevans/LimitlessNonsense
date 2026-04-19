@@ -24,15 +24,15 @@ public class AddMessageCreationTimePrefix
 
     public async Task Process(MiddlewareContext context, Func<MiddlewareContext, Task> next)
     {
-        if ((context.Message.Role & _exclude) != 0)
-            return;
-
-        // Set prefix to send time, e.g. `[13:46]Content`
-        var time = context.Message.TryGetMetadata<MessageCreationTime>();
-        if (time != null)
+        if ((context.Message.Role & _exclude) == 0)
         {
-            var t = time.Time.ToString(_format, CultureInfo.InvariantCulture);
-            context.Message.Prefix = $"{_pre}{t}{_post}{context.Message.Prefix}";
+            // Set prefix to send time, e.g. `[13:46]Content`
+            var time = context.Message.TryGetMetadata<MessageCreationTime>();
+            if (time != null)
+            {
+                var t = time.Time.ToString(_format, CultureInfo.InvariantCulture);
+                context.Message.Prefix = $"{_pre}{t}{_post}{context.Message.Prefix}";
+            }
         }
 
         await next(context);

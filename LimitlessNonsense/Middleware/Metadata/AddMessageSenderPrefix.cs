@@ -21,13 +21,13 @@ public class AddMessageSenderPrefix
 
     public async Task Process(MiddlewareContext context, Func<MiddlewareContext, Task> next)
     {
-        if ((context.Message.Role & _exclude) != 0)
-            return;
-
-        // Set prefix to sender name, e.g. `[Martin]Content`
-        var sender = context.Message.TryGetMetadata<MessageSender>();
-        if (!string.IsNullOrWhiteSpace(sender?.Name))
-            context.Message.Prefix = $"{_pre}{sender.Name}{_post}{context.Message.Prefix}";
+        if ((context.Message.Role & _exclude) == 0)
+        {
+            // Set prefix to sender name, e.g. `[Martin]Content`
+            var sender = context.Message.TryGetMetadata<MessageSender>();
+            if (!string.IsNullOrWhiteSpace(sender?.Name))
+                context.Message.Prefix = $"{_pre}{sender.Name}{_post}{context.Message.Prefix}";
+        }
 
         await next(context);
     }
