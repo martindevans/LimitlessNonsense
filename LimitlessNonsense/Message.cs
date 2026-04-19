@@ -52,7 +52,9 @@ public sealed record Message
     public TMetadata? TryGetMetadata<TMetadata>()
         where TMetadata : class, IMessageMetadata
     {
-        return (TMetadata?)_metadata.GetValueOrDefault(typeof(TMetadata), null);
+        if (!TryGetMetadata<TMetadata>(out var item))
+            return null;
+        return item;
     }
 
     /// <summary>
@@ -122,6 +124,7 @@ public sealed record Message
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum MessageRole
 {
+    None = 0,
     System = 1,
     Assistant = 2,
     Reasoning = 4,

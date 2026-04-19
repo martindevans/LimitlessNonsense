@@ -12,16 +12,21 @@ public class AddMessageCreationTimePrefix
     private readonly string _format;
     private readonly string _pre;
     private readonly string _post;
+    private readonly MessageRole _exclude;
 
-    public AddMessageCreationTimePrefix(string format = "t", string pre = "[", string post = "]")
+    public AddMessageCreationTimePrefix(string format = "t", string pre = "[", string post = "]", MessageRole exclude = MessageRole.None)
     {
         _format = format;
         _pre = pre;
         _post = post;
+        _exclude = exclude;
     }
 
     public async Task Process(MiddlewareContext context, Func<MiddlewareContext, Task> next)
     {
+        if ((context.Message.Role & _exclude) != 0)
+            return;
+
         // Set prefix to send time, e.g. `[13:46]Content`
         var time = context.Message.TryGetMetadata<MessageCreationTime>();
         if (time != null)
