@@ -5,8 +5,8 @@ namespace LimitlessNonsense.Middleware.Metadata;
 /// <summary>
 /// Adds a prefix to message content
 /// </summary>
-public class AddMessageSenderPrefix
-    : IMiddleware
+public class AddMessageSenderPrefix<TUserData>
+    : IMiddleware<TUserData>
 {
     private readonly string _pre;
     private readonly string _post;
@@ -19,7 +19,7 @@ public class AddMessageSenderPrefix
         _exclude = exclude;
     }
 
-    public async Task Process(MiddlewareContext context, Func<MiddlewareContext, Task> next)
+    public async Task Process(MiddlewareContext<TUserData> context, Func<MiddlewareContext<TUserData>, Task> next)
     {
         if ((context.Message.Role & _exclude) == 0)
         {

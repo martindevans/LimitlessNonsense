@@ -1,26 +1,16 @@
 ﻿namespace LimitlessNonsense.Middleware;
 
-public sealed class MiddlewareContext
-{
-    public MiddlewareContext(List<Message> history, DateTime now, Message message)
-    {
-        History = history;
-        UtcNow = now;
-        Message = message;
-    }
-
-    /// <summary>
-    /// The current time
-    /// </summary>
-    public DateTime UtcNow { get; }
-
-    /// <summary>
-    /// History of all messages
-    /// </summary>
-    public List<Message> History { get; }
-
-    /// <summary>
-    /// The new message that is about to be added
-    /// </summary>
-    public Message Message { get; }
-}
+/// <summary>
+/// 
+/// </summary>
+/// <typeparam name="TUserData"></typeparam>
+/// <param name="History">History of all messages</param>
+/// <param name="UtcNow">The current time</param>
+/// <param name="Message">The new message that is about to be added</param>
+/// <param name="UserData">Extra user data</param>
+public sealed record MiddlewareContext<TUserData>(
+    List<Message> History,
+    DateTime UtcNow,
+    Message Message,
+    TUserData UserData
+);

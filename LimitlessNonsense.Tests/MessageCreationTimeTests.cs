@@ -10,13 +10,13 @@ public sealed class AddMessageCreationTimeMetadataTests
 {
     private static readonly DateTime Now = new(2024, 6, 1, 13, 46, 0, DateTimeKind.Utc);
 
-    private static MiddlewareContext Context(DateTime now, Message? message = null)
+    private static MiddlewareContext<int> Context(DateTime now, Message? message = null)
     {
         message ??= new Message(MessageRole.User);
-        return new MiddlewareContext([], now, message);
+        return new MiddlewareContext<int>([], now, message, 0);
     }
 
-    private static Task NoOp(MiddlewareContext _) => Task.CompletedTask;
+    private static Task NoOp(MiddlewareContext<int> _) => Task.CompletedTask;
 
     // -------------------------------------------------------------------------
     // Metadata added
@@ -28,7 +28,7 @@ public sealed class AddMessageCreationTimeMetadataTests
         var message = new Message(MessageRole.User);
         var context = Context(Now, message);
 
-        await new AddMessageCreationTimeMetadata().Process(context, NoOp);
+        await new AddMessageCreationTimeMetadata<int>().Process(context, NoOp);
 
         Assert.IsTrue(message.HasMetadata<MessageCreationTime>());
     }
@@ -39,7 +39,7 @@ public sealed class AddMessageCreationTimeMetadataTests
         var message = new Message(MessageRole.User);
         var context = Context(Now, message);
 
-        await new AddMessageCreationTimeMetadata().Process(context, NoOp);
+        await new AddMessageCreationTimeMetadata<int>().Process(context, NoOp);
 
         Assert.AreEqual(Now, message.TryGetMetadata<MessageCreationTime>()!.Time);
     }
@@ -56,7 +56,7 @@ public sealed class AddMessageCreationTimeMetadataTests
         message.SetMetadata(new MessageCreationTime(earlier));
         var context = Context(Now, message);
 
-        await new AddMessageCreationTimeMetadata(overwrite: false).Process(context, NoOp);
+        await new AddMessageCreationTimeMetadata<int>(overwrite: false).Process(context, NoOp);
 
         Assert.AreEqual(earlier, message.TryGetMetadata<MessageCreationTime>()!.Time);
     }
@@ -69,7 +69,7 @@ public sealed class AddMessageCreationTimeMetadataTests
         message.SetMetadata(new MessageCreationTime(earlier));
         var context = Context(Now, message);
 
-        await new AddMessageCreationTimeMetadata(overwrite: true).Process(context, NoOp);
+        await new AddMessageCreationTimeMetadata<int>(overwrite: true).Process(context, NoOp);
 
         Assert.AreEqual(Now, message.TryGetMetadata<MessageCreationTime>()!.Time);
     }
@@ -84,7 +84,7 @@ public sealed class AddMessageCreationTimeMetadataTests
         var context = Context(Now);
         var called = false;
 
-        await new AddMessageCreationTimeMetadata().Process(context, _ => { called = true; return Task.CompletedTask; });
+        await new AddMessageCreationTimeMetadata<int>().Process(context, _ => { called = true; return Task.CompletedTask; });
 
         Assert.IsTrue(called);
     }
@@ -97,7 +97,7 @@ public sealed class AddMessageCreationTimeMetadataTests
         var context = Context(Now, message);
         var called = false;
 
-        await new AddMessageCreationTimeMetadata(overwrite: false).Process(context, _ => { called = true; return Task.CompletedTask; });
+        await new AddMessageCreationTimeMetadata<int>(overwrite: false).Process(context, _ => { called = true; return Task.CompletedTask; });
 
         Assert.IsTrue(called);
     }
@@ -108,8 +108,8 @@ public sealed class AddMessageTimePrefixTests
 {
     private static readonly DateTime Now = new(2024, 6, 1, 13, 46, 0, DateTimeKind.Utc);
 
-    private static MiddlewareContext ContextWithMessage(Message message)
-        => new([], Now, message);
+    private static MiddlewareContext<int> ContextWithMessage(Message message)
+        => new([], Now, message, 0);
 
     private static Message MessageWithCreationTime(DateTime time, string prefix = "")
     {
@@ -119,7 +119,7 @@ public sealed class AddMessageTimePrefixTests
         return msg;
     }
 
-    private static Task NoOp(MiddlewareContext _) => Task.CompletedTask;
+    private static Task NoOp(MiddlewareContext<int> _) => Task.CompletedTask;
 
     // -------------------------------------------------------------------------
     // No metadata — prefix unchanged
@@ -131,7 +131,7 @@ public sealed class AddMessageTimePrefixTests
         var message = new Message(MessageRole.User);
         var context = ContextWithMessage(message);
 
-        await new AddMessageCreationTimePrefix().Process(context, NoOp);
+        await new AddMessageCreationTimePrefix<int>().Process(context, NoOp);
 
         Assert.AreEqual("", message.Prefix);
     }
@@ -143,7 +143,7 @@ public sealed class AddMessageTimePrefixTests
         var context = ContextWithMessage(message);
         var called = false;
 
-        await new AddMessageCreationTimePrefix().Process(context, _ => { called = true; return Task.CompletedTask; });
+        await new AddMessageCreationTimePrefix<int>().Process(context, _ => { called = true; return Task.CompletedTask; });
 
         Assert.IsTrue(called);
     }
@@ -158,7 +158,7 @@ public sealed class AddMessageTimePrefixTests
         var message = MessageWithCreationTime(Now);
         var context = ContextWithMessage(message);
 
-        await new AddMessageCreationTimePrefix().Process(context, NoOp);
+        await new AddMessageCreationTimePrefix<int>().Process(context, NoOp);
 
         Assert.IsGreaterThan(0, message.Prefix.Length);
     }
@@ -169,7 +169,7 @@ public sealed class AddMessageTimePrefixTests
         var message = MessageWithCreationTime(Now);
         var context = ContextWithMessage(message);
 
-        await new AddMessageCreationTimePrefix().Process(context, NoOp);
+        await new AddMessageCreationTimePrefix<int>().Process(context, NoOp);
 
         // Default: format="t", pre="[", post="]" — "t" with InvariantCulture gives HH:mm
         Assert.AreEqual("[13:46]", message.Prefix);
@@ -181,7 +181,7 @@ public sealed class AddMessageTimePrefixTests
         var message = MessageWithCreationTime(Now);
         var context = ContextWithMessage(message);
 
-        await new AddMessageCreationTimePrefix(format: "HH:mm:ss").Process(context, NoOp);
+        await new AddMessageCreationTimePrefix<int>(format: "HH:mm:ss").Process(context, NoOp);
 
         Assert.AreEqual("[13:46:00]", message.Prefix);
     }
@@ -192,7 +192,7 @@ public sealed class AddMessageTimePrefixTests
         var message = MessageWithCreationTime(Now);
         var context = ContextWithMessage(message);
 
-        await new AddMessageCreationTimePrefix(pre: "(", post: ")").Process(context, NoOp);
+        await new AddMessageCreationTimePrefix<int>(pre: "(", post: ")").Process(context, NoOp);
 
         Assert.AreEqual("(13:46)", message.Prefix);
     }
@@ -203,7 +203,7 @@ public sealed class AddMessageTimePrefixTests
         var message = MessageWithCreationTime(Now);
         var context = ContextWithMessage(message);
 
-        await new AddMessageCreationTimePrefix(pre: "", post: "").Process(context, NoOp);
+        await new AddMessageCreationTimePrefix<int>(pre: "", post: "").Process(context, NoOp);
 
         Assert.AreEqual("13:46", message.Prefix);
     }
@@ -218,7 +218,7 @@ public sealed class AddMessageTimePrefixTests
         var message = MessageWithCreationTime(Now, prefix: "existing");
         var context = ContextWithMessage(message);
 
-        await new AddMessageCreationTimePrefix().Process(context, NoOp);
+        await new AddMessageCreationTimePrefix<int>().Process(context, NoOp);
 
         Assert.AreEqual("[13:46]existing", message.Prefix);
     }
@@ -234,7 +234,7 @@ public sealed class AddMessageTimePrefixTests
         var context = ContextWithMessage(message);
         var called = false;
 
-        await new AddMessageCreationTimePrefix().Process(context, _ => { called = true; return Task.CompletedTask; });
+        await new AddMessageCreationTimePrefix<int>().Process(context, _ => { called = true; return Task.CompletedTask; });
 
         Assert.IsTrue(called);
     }
@@ -249,7 +249,7 @@ public sealed class AddMessageTimePrefixTests
         var message = MessageWithCreationTime(Now);
         var context = ContextWithMessage(message);
 
-        await new AddMessageCreationTimePrefix(exclude: MessageRole.User).Process(context, NoOp);
+        await new AddMessageCreationTimePrefix<int>(exclude: MessageRole.User).Process(context, NoOp);
 
         Assert.AreEqual("", message.Prefix);
     }
@@ -261,7 +261,7 @@ public sealed class AddMessageTimePrefixTests
         var context = ContextWithMessage(message);
         var called = false;
 
-        await new AddMessageCreationTimePrefix(exclude: MessageRole.User).Process(context, _ => { called = true; return Task.CompletedTask; });
+        await new AddMessageCreationTimePrefix<int>(exclude: MessageRole.User).Process(context, _ => { called = true; return Task.CompletedTask; });
 
         Assert.IsTrue(called);
     }
@@ -272,7 +272,7 @@ public sealed class AddMessageTimePrefixTests
         var message = MessageWithCreationTime(Now);
         var context = ContextWithMessage(message);
 
-        await new AddMessageCreationTimePrefix(exclude: MessageRole.Assistant).Process(context, NoOp);
+        await new AddMessageCreationTimePrefix<int>(exclude: MessageRole.Assistant).Process(context, NoOp);
 
         Assert.AreEqual("[13:46]", message.Prefix);
     }
@@ -283,7 +283,7 @@ public sealed class AddMessageTimePrefixTests
         var message = MessageWithCreationTime(Now);
         var context = ContextWithMessage(message);
 
-        await new AddMessageCreationTimePrefix(exclude: MessageRole.User | MessageRole.Assistant).Process(context, NoOp);
+        await new AddMessageCreationTimePrefix<int>(exclude: MessageRole.User | MessageRole.Assistant).Process(context, NoOp);
 
         Assert.AreEqual("", message.Prefix);
     }

@@ -87,12 +87,12 @@ var json = JsonSerializer.Serialize(policies, options);
 Console.WriteLine(json);
 var output = JsonSerializer.Deserialize<CleanupPolicy[]>(json, options);
 
-var pipeline = new Pipeline([
-    new AddMessageCreationTimeMetadata(),
-    new DateChangedMessage(),
-    new ElapsedTimeMessage(TimeSpan.FromMinutes(10)),
-    new AddMessageCreationTimePrefix(),
-    new AddMessageSenderPrefix()
+var pipeline = new Pipeline<int>([
+    new AddMessageCreationTimeMetadata<int>(),
+    new DateChangedMessage<int>(),
+    new ElapsedTimeMessage<int>(TimeSpan.FromMinutes(10)),
+    new AddMessageCreationTimePrefix<int>(),
+    new AddMessageSenderPrefix<int>()
 ]);
     
 
@@ -101,12 +101,13 @@ var pipeline = new Pipeline([
 var sys = new Message(MessageRole.System, MessageImportance.VeryHigh, "System Prompt", Guid.NewGuid());
 sys.SetMetadata(new MessageCreationTime(DateTime.UtcNow - TimeSpan.FromMinutes(30)));
 
-var ctx = new MiddlewareContext(
+var ctx = new MiddlewareContext<int>(
     [
         sys
     ],
     DateTime.UtcNow,
-    new Message(MessageRole.User, MessageImportance.Normal, "Hi")
+    new Message(MessageRole.User, MessageImportance.Normal, "Hi"),
+    0
 );
 
 pipeline.Apply(ctx);

@@ -6,8 +6,8 @@ namespace LimitlessNonsense.Middleware.Time;
 /// <summary>
 /// Insert a message like "The date is now $date" when the date from the previous message to the current one changes.
 /// </summary>
-public class DateChangedMessage
-    : IMiddleware
+public class DateChangedMessage<TUserData>
+    : IMiddleware<TUserData>
 {
     private readonly string _prefix;
     private readonly string _format;
@@ -20,7 +20,7 @@ public class DateChangedMessage
         _suffix = suffix;
     }
 
-    public async Task Process(MiddlewareContext context, Func<MiddlewareContext, Task> next)
+    public async Task Process(MiddlewareContext<TUserData> context, Func<MiddlewareContext<TUserData>, Task> next)
     {
         var previous = FindLastDate(context);
         var dateNow = DateOnly.FromDateTime(context.UtcNow);
@@ -43,7 +43,7 @@ public class DateChangedMessage
         await next(context);
     }
 
-    private static DateOnly? FindLastDate(MiddlewareContext context)
+    private static DateOnly? FindLastDate(MiddlewareContext<TUserData> context)
     {
         for (var i = context.History.Count - 1; i >= 0; i--)
         {

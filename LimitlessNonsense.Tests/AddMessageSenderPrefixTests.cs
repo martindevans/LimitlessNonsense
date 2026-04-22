@@ -14,10 +14,10 @@ public sealed class AddMessageSenderPrefixTests
         return msg;
     }
 
-    private static MiddlewareContext Context(Message message)
-        => new([], DateTime.UtcNow, message);
+    private static MiddlewareContext<int> Context(Message message)
+        => new([], DateTime.UtcNow, message, 0);
 
-    private static Task NoOp(MiddlewareContext _) => Task.CompletedTask;
+    private static Task NoOp(MiddlewareContext<int> _) => Task.CompletedTask;
 
     // -------------------------------------------------------------------------
     // No sender metadata
@@ -27,7 +27,7 @@ public sealed class AddMessageSenderPrefixTests
     public async Task Process_NoSenderMetadata_PrefixUnchanged()
     {
         var msg = new Message(MessageRole.User);
-        var middleware = new AddMessageSenderPrefix();
+        var middleware = new AddMessageSenderPrefix<int>();
         var context = Context(msg);
 
         await middleware.Process(context, NoOp);
@@ -43,7 +43,7 @@ public sealed class AddMessageSenderPrefixTests
     public async Task Process_SenderWithValidName_PrependsSenderPrefixWithDefaultBrackets()
     {
         var msg = MsgWithSender("Martin");
-        var middleware = new AddMessageSenderPrefix();
+        var middleware = new AddMessageSenderPrefix<int>();
         var context = Context(msg);
 
         await middleware.Process(context, NoOp);
@@ -56,7 +56,7 @@ public sealed class AddMessageSenderPrefixTests
     {
         var msg = MsgWithSender("Alice");
         msg.Prefix = "existing";
-        var middleware = new AddMessageSenderPrefix();
+        var middleware = new AddMessageSenderPrefix<int>();
         var context = Context(msg);
 
         await middleware.Process(context, NoOp);
@@ -72,7 +72,7 @@ public sealed class AddMessageSenderPrefixTests
     public async Task Process_SenderWithEmptyName_PrefixUnchanged()
     {
         var msg = MsgWithSender("");
-        var middleware = new AddMessageSenderPrefix();
+        var middleware = new AddMessageSenderPrefix<int>();
         var context = Context(msg);
 
         await middleware.Process(context, NoOp);
@@ -84,7 +84,7 @@ public sealed class AddMessageSenderPrefixTests
     public async Task Process_SenderWithWhitespaceName_PrefixUnchanged()
     {
         var msg = MsgWithSender("   ");
-        var middleware = new AddMessageSenderPrefix();
+        var middleware = new AddMessageSenderPrefix<int>();
         var context = Context(msg);
 
         await middleware.Process(context, NoOp);
@@ -100,7 +100,7 @@ public sealed class AddMessageSenderPrefixTests
     public async Task Process_CustomDelimiters_UsesCustomPreAndPost()
     {
         var msg = MsgWithSender("Bob");
-        var middleware = new AddMessageSenderPrefix(pre: "<", post: ">");
+        var middleware = new AddMessageSenderPrefix<int>(pre: "<", post: ">");
         var context = Context(msg);
 
         await middleware.Process(context, NoOp);
@@ -112,7 +112,7 @@ public sealed class AddMessageSenderPrefixTests
     public async Task Process_CustomDelimiters_EmptyStrings_OnlyNameInPrefix()
     {
         var msg = MsgWithSender("Bob");
-        var middleware = new AddMessageSenderPrefix(pre: "", post: "");
+        var middleware = new AddMessageSenderPrefix<int>(pre: "", post: "");
         var context = Context(msg);
 
         await middleware.Process(context, NoOp);
@@ -128,11 +128,11 @@ public sealed class AddMessageSenderPrefixTests
     public async Task Process_WithSender_StillCallsNext()
     {
         var msg = MsgWithSender("Martin");
-        var middleware = new AddMessageSenderPrefix();
+        var middleware = new AddMessageSenderPrefix<int>();
         var context = Context(msg);
         var called = false;
 
-        await middleware.Process(context, ctx => { called = true; return Task.CompletedTask; });
+        await middleware.Process(context, _ => { called = true; return Task.CompletedTask; });
 
         Assert.IsTrue(called);
     }
@@ -141,11 +141,11 @@ public sealed class AddMessageSenderPrefixTests
     public async Task Process_WithoutSender_StillCallsNext()
     {
         var msg = new Message(MessageRole.User);
-        var middleware = new AddMessageSenderPrefix();
+        var middleware = new AddMessageSenderPrefix<int>();
         var context = Context(msg);
         var called = false;
 
-        await middleware.Process(context, ctx => { called = true; return Task.CompletedTask; });
+        await middleware.Process(context, _ => { called = true; return Task.CompletedTask; });
 
         Assert.IsTrue(called);
     }
@@ -158,7 +158,7 @@ public sealed class AddMessageSenderPrefixTests
     public async Task Process_ExcludedRole_PrefixUnchanged()
     {
         var msg = MsgWithSender("Martin");
-        var middleware = new AddMessageSenderPrefix(exclude: MessageRole.User);
+        var middleware = new AddMessageSenderPrefix<int>(exclude: MessageRole.User);
         var context = Context(msg);
 
         await middleware.Process(context, NoOp);
@@ -170,11 +170,11 @@ public sealed class AddMessageSenderPrefixTests
     public async Task Process_ExcludedRole_StillCallsNext()
     {
         var msg = MsgWithSender("Martin");
-        var middleware = new AddMessageSenderPrefix(exclude: MessageRole.User);
+        var middleware = new AddMessageSenderPrefix<int>(exclude: MessageRole.User);
         var context = Context(msg);
         var called = false;
 
-        await middleware.Process(context, ctx => { called = true; return Task.CompletedTask; });
+        await middleware.Process(context, _ => { called = true; return Task.CompletedTask; });
 
         Assert.IsTrue(called);
     }
@@ -183,7 +183,7 @@ public sealed class AddMessageSenderPrefixTests
     public async Task Process_NonExcludedRole_PrefixApplied()
     {
         var msg = MsgWithSender("Martin");
-        var middleware = new AddMessageSenderPrefix(exclude: MessageRole.Assistant);
+        var middleware = new AddMessageSenderPrefix<int>(exclude: MessageRole.Assistant);
         var context = Context(msg);
 
         await middleware.Process(context, NoOp);
@@ -195,7 +195,7 @@ public sealed class AddMessageSenderPrefixTests
     public async Task Process_ExcludedRoleFlags_MatchingRoleExcluded()
     {
         var msg = MsgWithSender("Martin");
-        var middleware = new AddMessageSenderPrefix(exclude: MessageRole.User | MessageRole.Assistant);
+        var middleware = new AddMessageSenderPrefix<int>(exclude: MessageRole.User | MessageRole.Assistant);
         var context = Context(msg);
 
         await middleware.Process(context, NoOp);
