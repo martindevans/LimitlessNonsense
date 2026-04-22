@@ -26,8 +26,8 @@ public class Pipeline<TUserData>
     /// Apply this pipeline to a context
     /// </summary>
     /// <param name="context"></param>
-    public void Apply(MiddlewareContext<TUserData> context)
+    public async Task Apply(MiddlewareContext<TUserData> context)
     {
-        _run(context);
+        await _run(context);
     }
 }

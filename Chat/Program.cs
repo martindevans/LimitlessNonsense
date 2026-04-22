@@ -110,6 +110,6 @@ var ctx = new MiddlewareContext<int>(
     0
 );
 
-pipeline.Apply(ctx);
+await pipeline.Apply(ctx);
 
 Console.WriteLine(ctx);
