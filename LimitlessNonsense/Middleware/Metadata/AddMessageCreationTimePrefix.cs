@@ -6,8 +6,8 @@ namespace LimitlessNonsense.Middleware.Metadata;
 /// <summary>
 /// Adds a prefix to message content with the time of the message was created
 /// </summary>
-public class AddMessageCreationTimePrefix
-    : IMiddleware
+public class AddMessageCreationTimePrefix<TUserData>
+    : IMiddleware<TUserData>
 {
     private readonly string _format;
     private readonly string _pre;
@@ -22,7 +22,7 @@ public class AddMessageCreationTimePrefix
         _exclude = exclude;
     }
 
-    public async Task Process(MiddlewareContext context, Func<MiddlewareContext, Task> next)
+    public async Task Process(MiddlewareContext<TUserData> context, Func<MiddlewareContext<TUserData>, Task> next)
     {
         if ((context.Message.Role & _exclude) == 0)
         {

@@ -18,13 +18,13 @@ public sealed class DateChangedMessageTests
         return msg;
     }
 
-    private static MiddlewareContext Context(DateTime now, params Message[] history)
+    private static MiddlewareContext<int> Context(DateTime now, params Message[] history)
     {
         var newMsg = new Message(MessageRole.User);
-        return new MiddlewareContext([.. history], now, newMsg);
+        return new MiddlewareContext<int>([.. history], now, newMsg, 0);
     }
 
-    private static Task NoOp(MiddlewareContext _) => Task.CompletedTask;
+    private static Task NoOp(MiddlewareContext<int> _) => Task.CompletedTask;
 
     // -------------------------------------------------------------------------
     // No message added
@@ -33,7 +33,7 @@ public sealed class DateChangedMessageTests
     [TestMethod]
     public async Task Process_EmptyHistory_DoesNotAddMessage()
     {
-        var middleware = new DateChangedMessage();
+        var middleware = new DateChangedMessage<int>();
         var context = Context(Day2);
 
         await middleware.Process(context, NoOp);
@@ -45,7 +45,7 @@ public sealed class DateChangedMessageTests
     public async Task Process_HistoryWithNoDatedMessages_DoesNotAddMessage()
     {
         var undated = new Message(MessageRole.User, content: "hello");
-        var middleware = new DateChangedMessage();
+        var middleware = new DateChangedMessage<int>();
         var context = Context(Day2, undated);
 
         await middleware.Process(context, NoOp);
@@ -58,7 +58,7 @@ public sealed class DateChangedMessageTests
     public async Task Process_DateUnchanged_DoesNotAddMessage()
     {
         var existing = DatedMsg(Day1);
-        var middleware = new DateChangedMessage();
+        var middleware = new DateChangedMessage<int>();
         var context = Context(Day1.AddHours(1), existing);
 
         await middleware.Process(context, NoOp);
@@ -74,7 +74,7 @@ public sealed class DateChangedMessageTests
     public async Task Process_DateChanged_AddsOneMessage()
     {
         var existing = DatedMsg(Day1);
-        var middleware = new DateChangedMessage();
+        var middleware = new DateChangedMessage<int>();
         var context = Context(Day2, existing);
 
         await middleware.Process(context, NoOp);
@@ -86,7 +86,7 @@ public sealed class DateChangedMessageTests
     public async Task Process_DateChanged_AddedMessageHasCorrectRoleAndImportance()
     {
         var existing = DatedMsg(Day1);
-        var middleware = new DateChangedMessage();
+        var middleware = new DateChangedMessage<int>();
         var context = Context(Day2, existing);
 
         await middleware.Process(context, NoOp);
@@ -100,7 +100,7 @@ public sealed class DateChangedMessageTests
     public async Task Process_DateChanged_AddedMessageHasCorrectDefaultContent()
     {
         var existing = DatedMsg(Day1);
-        var middleware = new DateChangedMessage();
+        var middleware = new DateChangedMessage<int>();
         var context = Context(Day2, existing);
 
         await middleware.Process(context, NoOp);
@@ -113,7 +113,7 @@ public sealed class DateChangedMessageTests
     public async Task Process_DateChanged_AddedMessageHasCustomPrefixFormatSuffix()
     {
         var existing = DatedMsg(Day1);
-        var middleware = new DateChangedMessage(prefix: "Date: ", format: "yyyy-MM-dd", suffix: ".");
+        var middleware = new DateChangedMessage<int>(prefix: "Date: ", format: "yyyy-MM-dd", suffix: ".");
         var context = Context(Day2, existing);
 
         await middleware.Process(context, NoOp);
@@ -126,7 +126,7 @@ public sealed class DateChangedMessageTests
     public async Task Process_DateChanged_AddedMessageIsTaggedWithDate()
     {
         var existing = DatedMsg(Day1);
-        var middleware = new DateChangedMessage();
+        var middleware = new DateChangedMessage<int>();
         var context = Context(Day2, existing);
 
         await middleware.Process(context, NoOp);
@@ -144,7 +144,7 @@ public sealed class DateChangedMessageTests
     public async Task Process_DateChanged_SecondCallSameDay_DoesNotAddAnotherMessage()
     {
         var existing = DatedMsg(Day1);
-        var middleware = new DateChangedMessage();
+        var middleware = new DateChangedMessage<int>();
         var context = Context(Day2, existing);
 
         // First call adds the date-changed message
@@ -162,7 +162,7 @@ public sealed class DateChangedMessageTests
     public async Task Process_DateChanged_SubsequentDateChange_AddsAnotherMessage()
     {
         var existing = DatedMsg(Day1);
-        var middleware = new DateChangedMessage();
+        var middleware = new DateChangedMessage<int>();
         var context = Context(Day2, existing);
 
         await middleware.Process(context, NoOp);
@@ -185,7 +185,7 @@ public sealed class DateChangedMessageTests
         // Two messages processed at the same timestamp, both seeing the date change from Day1 to Day2.
         // The first Process call adds a date-changed message; the second sees it and should not add another.
         var existing = DatedMsg(Day1);
-        var middleware = new DateChangedMessage();
+        var middleware = new DateChangedMessage<int>();
         var context = Context(Day2, existing);
 
         // Simulate both messages being processed against the same evolving history
@@ -207,7 +207,7 @@ public sealed class DateChangedMessageTests
         // Should look at the last dated message (Day2), see no change, and not add.
         var old = DatedMsg(Day1);
         var recent = DatedMsg(Day2);
-        var middleware = new DateChangedMessage();
+        var middleware = new DateChangedMessage<int>();
         var context = Context(Day2.AddHours(1), old, recent);
 
         await middleware.Process(context, NoOp);
@@ -222,7 +222,7 @@ public sealed class DateChangedMessageTests
         // Should look at the last dated message (Day2) and add a date-change message for Day3.
         var old = DatedMsg(Day1);
         var recent = DatedMsg(Day2);
-        var middleware = new DateChangedMessage();
+        var middleware = new DateChangedMessage<int>();
         var context = Context(Day3, old, recent);
 
         await middleware.Process(context, NoOp);
@@ -238,7 +238,7 @@ public sealed class DateChangedMessageTests
     public async Task Process_DateUnchanged_StillCallsNext()
     {
         var existing = DatedMsg(Day1);
-        var middleware = new DateChangedMessage();
+        var middleware = new DateChangedMessage<int>();
         var context = Context(Day1, existing);
         var called = false;
 
@@ -251,7 +251,7 @@ public sealed class DateChangedMessageTests
     public async Task Process_DateChanged_StillCallsNext()
     {
         var existing = DatedMsg(Day1);
-        var middleware = new DateChangedMessage();
+        var middleware = new DateChangedMessage<int>();
         var context = Context(Day2, existing);
         var called = false;
 
@@ -263,7 +263,7 @@ public sealed class DateChangedMessageTests
     [TestMethod]
     public async Task Process_EmptyHistory_StillCallsNext()
     {
-        var middleware = new DateChangedMessage();
+        var middleware = new DateChangedMessage<int>();
         var context = Context(Day1);
         var called = false;
 

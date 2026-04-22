@@ -10,8 +10,8 @@ public sealed class ElapsedTimeMessageTests
     private static readonly TimeSpan Threshold = TimeSpan.FromHours(1);
     private static readonly DateTime BaseTime = new(2024, 1, 1, 12, 0, 0, DateTimeKind.Utc);
 
-    private static MiddlewareContext Context(DateTime now, params Message[] history)
-        => new(new List<Message>(history), now, new Message(MessageRole.User));
+    private static MiddlewareContext<int> Context(DateTime now, params Message[] history)
+        => new(new List<Message>(history), now, new Message(MessageRole.User), 0);
 
     private static Message MessageWithTime(DateTime time, MessageRole role = MessageRole.User)
     {
@@ -20,7 +20,7 @@ public sealed class ElapsedTimeMessageTests
         return msg;
     }
 
-    private static Task NoOp(MiddlewareContext _) => Task.CompletedTask;
+    private static Task NoOp(MiddlewareContext<int> _) => Task.CompletedTask;
 
     // -------------------------------------------------------------------------
     // Below Threshold
@@ -32,7 +32,7 @@ public sealed class ElapsedTimeMessageTests
         var last = MessageWithTime(BaseTime);
         var ctx = Context(BaseTime + TimeSpan.FromMinutes(30), last);
 
-        await new ElapsedTimeMessage(Threshold).Process(ctx, NoOp);
+        await new ElapsedTimeMessage<int>(Threshold).Process(ctx, NoOp);
 
         Assert.HasCount(1, ctx.History);
     }
@@ -43,7 +43,7 @@ public sealed class ElapsedTimeMessageTests
         var last = MessageWithTime(BaseTime);
         var ctx = Context(BaseTime + Threshold, last);
 
-        await new ElapsedTimeMessage(Threshold).Process(ctx, NoOp);
+        await new ElapsedTimeMessage<int>(Threshold).Process(ctx, NoOp);
 
         Assert.HasCount(1, ctx.History);
     }
@@ -58,7 +58,7 @@ public sealed class ElapsedTimeMessageTests
         var last = MessageWithTime(BaseTime);
         var ctx = Context(BaseTime + TimeSpan.FromHours(2), last);
 
-        await new ElapsedTimeMessage(Threshold).Process(ctx, NoOp);
+        await new ElapsedTimeMessage<int>(Threshold).Process(ctx, NoOp);
 
         Assert.HasCount(2, ctx.History);
     }
@@ -69,7 +69,7 @@ public sealed class ElapsedTimeMessageTests
         var last = MessageWithTime(BaseTime);
         var ctx = Context(BaseTime + TimeSpan.FromHours(2), last);
 
-        await new ElapsedTimeMessage(Threshold).Process(ctx, NoOp);
+        await new ElapsedTimeMessage<int>(Threshold).Process(ctx, NoOp);
 
         Assert.AreEqual(MessageImportance.Ephemeral, ctx.History[^1].Importance);
     }
@@ -80,7 +80,7 @@ public sealed class ElapsedTimeMessageTests
         var last = MessageWithTime(BaseTime);
         var ctx = Context(BaseTime + TimeSpan.FromHours(2), last);
 
-        await new ElapsedTimeMessage(Threshold).Process(ctx, NoOp);
+        await new ElapsedTimeMessage<int>(Threshold).Process(ctx, NoOp);
 
         Assert.AreEqual(MessageRole.Tool, ctx.History[^1].Role);
     }
@@ -91,7 +91,7 @@ public sealed class ElapsedTimeMessageTests
         var last = MessageWithTime(BaseTime);
         var ctx = Context(BaseTime + TimeSpan.FromHours(2), last);
 
-        await new ElapsedTimeMessage(Threshold).Process(ctx, NoOp);
+        await new ElapsedTimeMessage<int>(Threshold).Process(ctx, NoOp);
 
         Assert.IsTrue(ctx.History[^1].Content.Contains("since last message", StringComparison.Ordinal));
     }
@@ -105,7 +105,7 @@ public sealed class ElapsedTimeMessageTests
     {
         var last = MessageWithTime(BaseTime);
         var ctx = Context(BaseTime + TimeSpan.FromHours(2), last);
-        var middleware = new ElapsedTimeMessage(Threshold);
+        var middleware = new ElapsedTimeMessage<int>(Threshold);
 
         await middleware.Process(ctx, NoOp);
         await middleware.Process(ctx, NoOp);
@@ -119,7 +119,7 @@ public sealed class ElapsedTimeMessageTests
     {
         var last = MessageWithTime(BaseTime);
         var ctx = Context(BaseTime + TimeSpan.FromHours(2), last);
-        var middleware = new ElapsedTimeMessage(Threshold);
+        var middleware = new ElapsedTimeMessage<int>(Threshold);
 
         await middleware.Process(ctx, NoOp);
         var firstElapsedMsg = ctx.History[^1];
@@ -138,7 +138,7 @@ public sealed class ElapsedTimeMessageTests
     {
         var ctx = Context(BaseTime);
 
-        await new ElapsedTimeMessage(Threshold).Process(ctx, NoOp);
+        await new ElapsedTimeMessage<int>(Threshold).Process(ctx, NoOp);
 
         Assert.IsEmpty(ctx.History);
     }
@@ -149,7 +149,7 @@ public sealed class ElapsedTimeMessageTests
         var msgWithoutTime = new Message(MessageRole.User);
         var ctx = Context(BaseTime + TimeSpan.FromHours(2), msgWithoutTime);
 
-        await new ElapsedTimeMessage(Threshold).Process(ctx, NoOp);
+        await new ElapsedTimeMessage<int>(Threshold).Process(ctx, NoOp);
 
         Assert.HasCount(1, ctx.History);
     }
@@ -161,7 +161,7 @@ public sealed class ElapsedTimeMessageTests
         var last = MessageWithTime(BaseTime);
         var ctx = Context(BaseTime, last);
 
-        await new ElapsedTimeMessage(Threshold).Process(ctx, NoOp);
+        await new ElapsedTimeMessage<int>(Threshold).Process(ctx, NoOp);
 
         Assert.HasCount(1, ctx.History);
     }
@@ -175,7 +175,7 @@ public sealed class ElapsedTimeMessageTests
         // Only 10 minutes have passed since the most recent message
         var ctx = Context(BaseTime + TimeSpan.FromHours(3) + TimeSpan.FromMinutes(10), oldMsg, recentMsg);
 
-        await new ElapsedTimeMessage(Threshold).Process(ctx, NoOp);
+        await new ElapsedTimeMessage<int>(Threshold).Process(ctx, NoOp);
 
         // 10 minutes is below the 1-hour threshold — no elapsed message added
         Assert.HasCount(2, ctx.History);

@@ -7,8 +7,8 @@ namespace LimitlessNonsense.Middleware.Time;
 /// <summary>
 /// Adds an ephemeral message indicating the elapsed time since the last message, if it is more than a certain threshold
 /// </summary>
-public class ElapsedTimeMessage
-    : IMiddleware
+public class ElapsedTimeMessage<TUserData>
+    : IMiddleware<TUserData>
 {
     private readonly TimeSpan _duration;
 
@@ -17,7 +17,7 @@ public class ElapsedTimeMessage
         _duration = duration;
     }
 
-    public async Task Process(MiddlewareContext context, Func<MiddlewareContext, Task> next)
+    public async Task Process(MiddlewareContext<TUserData> context, Func<MiddlewareContext<TUserData>, Task> next)
     {
         // Remove previous time message if it exists
         context.History.RemoveAll(static a => a.HasMetadata<EphemeralTimeElapsedMessage>());

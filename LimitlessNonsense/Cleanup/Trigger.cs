@@ -91,9 +91,8 @@ internal record Schedule(TimeOnly Time)
     {
         var nowTime = TimeOnly.FromDateTime(now);
 
+        // This wraps around, so e.g. Time=9am, now=10am will produce 23 hours.
         var next = Time - nowTime;
-        if (next < TimeSpan.Zero)
-            next += TimeSpan.FromDays(1);
 
         return next;
     }

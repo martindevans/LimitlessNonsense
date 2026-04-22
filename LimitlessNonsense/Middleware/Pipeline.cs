@@ -3,18 +3,16 @@
 /// <summary>
 /// A pipeline of operations that are applied to messages
 /// </summary>
-public class Pipeline
+public class Pipeline<TUserData>
 {
-    private readonly Func<MiddlewareContext, Task> _run;
+    private readonly Func<MiddlewareContext<TUserData>, Task> _run;
 
-    public Pipeline(params Span<IMiddleware> middleware)
+    public Pipeline(params Span<IMiddleware<TUserData>> middleware)
     {
-        var middleware1 = middleware.ToArray();
-
         _run = _ => Task.CompletedTask;
-        for (var i = middleware1.Length - 1; i >= 0; i--)
+        for (var i = middleware.Length - 1; i >= 0; i--)
         {
-            var item = middleware1[i];
+            var item = middleware[i];
 
             // Capture the current 'next' delegate
             var currentNext = _run;
@@ -28,8 +26,8 @@ public class Pipeline
     /// Apply this pipeline to a context
     /// </summary>
     /// <param name="context"></param>
-    public void Apply(MiddlewareContext context)
+    public async Task Apply(MiddlewareContext<TUserData> context)
     {
-        _run(context);
+        await _run(context);
     }
 }
